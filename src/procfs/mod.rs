@@ -3,8 +3,10 @@
 
 pub mod diskstats;
 pub mod kmsg;
+pub mod limits;
 pub mod loadavg;
 pub mod meminfo;
+pub mod mounts;
 pub mod net_dev;
 pub mod pid_stat;
 pub mod pressure;
