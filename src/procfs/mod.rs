@@ -6,6 +6,7 @@ pub mod loadavg;
 pub mod meminfo;
 pub mod pid_stat;
 pub mod pressure;
+pub mod stat;
 pub mod system;
 
 /// Error from a parser: the input did not have the expected shape.
