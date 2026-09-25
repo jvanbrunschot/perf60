@@ -8,6 +8,7 @@ pub mod pid_stat;
 pub mod pressure;
 pub mod stat;
 pub mod system;
+pub mod vmstat;
 
 /// Error from a parser: the input did not have the expected shape.
 #[derive(Debug, Clone, PartialEq)]

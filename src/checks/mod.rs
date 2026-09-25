@@ -6,6 +6,7 @@ use crate::check::Check;
 pub mod cpu;
 pub mod disk;
 pub mod load;
+pub mod memory;
 pub mod pressure;
 pub mod processes;
 
@@ -16,6 +17,8 @@ pub fn all() -> Vec<Box<dyn Check>> {
         Box::new(cpu::CpuBalance::default()),      // mpstat -P ALL 1
         Box::new(processes::Processes::default()), // pidstat 1
         Box::new(disk::Disk::default()),           // iostat -xz 1
+        Box::new(memory::Memory::default()),       // free -m
+        Box::new(memory::Swap::default()),         // vmstat si/so
         Box::new(pressure::Pressure::default()),   // top / PSI
     ]
 }
