@@ -67,8 +67,10 @@ Project context and rules for artifacts are in `openspec/config.yaml`.
   - fmt, clippy, cargo test and `openspec validate --all --strict`
   - `scripts/verify.sh` on an x86_64 runner and an arm64 runner
   All jobs must be green before merging.
-- Squash-merge the PR (`gh pr merge --squash`). The squash commit message is the conventional
-  feature message, so `main` keeps one commit per feature.
+- Merge with rebase (`gh pr merge --rebase`). The repo only allows rebase merges: squash and
+  merge commits are disabled in the settings and in the `main` ruleset. Each feature commit
+  lands on `main` as it is, so a one-feature PR is one commit and a phase PR keeps one commit
+  per feature. Merged branches are deleted automatically.
 - Don't push or merge without the user's go-ahead.
 
 ### Supply-chain rules (Shai-Hulud-style worms)
@@ -87,7 +89,7 @@ Project context and rules for artifacts are in `openspec/config.yaml`.
   7-day cooldown. Review the diff (SHA → tag) before merging.
 - **Repo settings (applied via `gh api`, not in git):**
   - ruleset `main: PR + green CI`: PR required, the four CI checks must pass and come from GitHub
-    Actions, no force-push or deletion, no bypass
+    Actions, rebase merges only, no force-push or deletion, no bypass
   - ruleset `release tags: admins only`: create, move and delete of `v*` tags
   - the actions allow-list with SHA pinning required
   - approval required before workflows run for all external contributors
