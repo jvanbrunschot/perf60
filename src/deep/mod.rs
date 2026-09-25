@@ -16,6 +16,7 @@ pub mod hist;
 #[cfg(feature = "deep")]
 pub mod probe;
 pub mod runqlat;
+pub mod tcpretrans;
 
 /// The `--deep` checks of this build.
 pub fn checks() -> Vec<Box<dyn Check>> {
@@ -24,6 +25,7 @@ pub fn checks() -> Vec<Box<dyn Check>> {
         vec![
             Box::new(execsnoop::Execsnoop::default()),
             Box::new(runqlat::Runqlat::default()),
+            Box::new(tcpretrans::Tcpretrans::default()),
         ]
     }
     #[cfg(not(feature = "deep"))]
