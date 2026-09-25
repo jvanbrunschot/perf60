@@ -24,7 +24,10 @@ pub struct SysInfo {
     pub hostname: Option<String>,
     pub kernel: Option<String>,
     pub distro: Option<String>,
+    /// Kernel architecture (see `kernel_arch`).
     pub arch: String,
+    /// Architecture perf60 was built for; differs from `arch` under emulation.
+    pub binary_arch: String,
     pub cpu_model: Option<String>,
     pub cpus_online: usize,
     pub cgroup_cpu_limit: Option<f64>,
@@ -90,7 +93,8 @@ pub fn collect(src: &dyn Source) -> SysInfo {
             .read_to_string("/etc/os-release")
             .ok()
             .and_then(|s| system::os_release_pretty_name(&s)),
-        arch: std::env::consts::ARCH.to_owned(),
+        arch: kernel_arch(src),
+        binary_arch: std::env::consts::ARCH.to_owned(),
         cpu_model: cpu.model,
         cpus_online,
         cgroup_cpu_limit,
@@ -106,6 +110,16 @@ pub fn collect(src: &dyn Source) -> SysInfo {
         block_devices: block_devices(src),
         interfaces: interfaces(src),
     }
+}
+
+/// `/proc/sys/kernel/arch`, else the kernel release suffix, else the build architecture.
+fn kernel_arch(src: &dyn Source) -> String {
+    trimmed(src, "/proc/sys/kernel/arch")
+        .or_else(|| {
+            trimmed(src, "/proc/sys/kernel/osrelease")
+                .and_then(|r| system::release_arch(&r).map(str::to_owned))
+        })
+        .unwrap_or_else(|| std::env::consts::ARCH.to_owned())
 }
 
 /// Walk from our own cgroup up to the root and take the tightest limits (v2), else try v1.
@@ -336,6 +350,20 @@ mod tests {
         let s = collect(&src);
         assert_eq!(s.cgroup_cpu_limit, None);
         assert_eq!(s.cgroup_mem_limit_bytes, None);
+    }
+
+    #[test]
+    fn arch_lookup_order() {
+        let from_file = MemSource::new()
+            .with("/proc/sys/kernel/arch", "aarch64\n")
+            .with("/proc/sys/kernel/osrelease", "3.10.0-1160.el7.x86_64\n");
+        assert_eq!(collect(&from_file).arch, "aarch64");
+        let from_release =
+            MemSource::new().with("/proc/sys/kernel/osrelease", "3.10.0-1160.el7.x86_64\n");
+        assert_eq!(collect(&from_release).arch, "x86_64");
+        let s = collect(&MemSource::new());
+        assert_eq!(s.arch, std::env::consts::ARCH);
+        assert_eq!(s.binary_arch, std::env::consts::ARCH);
     }
 
     #[test]

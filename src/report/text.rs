@@ -41,7 +41,14 @@ pub fn render(r: &Report, color: bool, verbose: bool) -> String {
     head.extend(sys.hostname.clone());
     head.extend(sys.kernel.as_ref().map(|k| format!("Linux {k}")));
     head.extend(sys.distro.clone());
-    head.push(sys.arch.clone());
+    if sys.binary_arch.is_empty() || sys.binary_arch == sys.arch {
+        head.push(sys.arch.clone());
+    } else {
+        head.push(format!(
+            "{} (binary {}, emulated)",
+            sys.arch, sys.binary_arch
+        ));
+    }
     head.push(format!(
         "{} cpus",
         units::cpus(sys.cpus_online.max(1) as f64)
@@ -193,6 +200,7 @@ mod tests {
             kernel: Some("6.8.0".into()),
             distro: Some("Ubuntu 24.04".into()),
             arch: "x86_64".into(),
+            binary_arch: "x86_64".into(),
             cpus_online: 8,
             mem_total_bytes: Some(16 << 30),
             cgroup_cpu_limit: Some(1.5),
@@ -282,6 +290,15 @@ mod tests {
         assert_eq!(cols.len(), 2);
         assert_eq!(cols[0], cols[1]);
         assert!(t.contains("cpu-balance sum"));
+    }
+
+    #[test]
+    fn emulated_binary_is_flagged() {
+        let mut r = report();
+        r.system.arch = "aarch64".into();
+        r.system.binary_arch = "x86_64".into();
+        let t = render(&r, false, false);
+        assert!(t.contains("· aarch64 (binary x86_64, emulated) ·"), "{t}");
     }
 
     #[test]

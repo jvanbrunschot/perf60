@@ -103,6 +103,22 @@ pub fn cpu_list_count(input: &str) -> Option<usize> {
     Some(n)
 }
 
+/// Architecture suffix of a kernel release, e.g. `3.10.0-1160.el7.x86_64` → `x86_64`.
+pub fn release_arch(release: &str) -> Option<&'static str> {
+    const KNOWN: [&str; 8] = [
+        "x86_64",
+        "aarch64",
+        "ppc64le",
+        "s390x",
+        "i686",
+        "armv7l",
+        "riscv64",
+        "loongarch64",
+    ];
+    let last = release.trim().rsplit(['.', '-', '+']).next()?;
+    KNOWN.into_iter().find(|a| *a == last)
+}
+
 /// `/proc/uptime`: `14937.42 59262.64` → seconds.
 pub fn uptime_secs(input: &str) -> Option<f64> {
     input.split_whitespace().next()?.parse().ok()
@@ -199,6 +215,14 @@ mod tests {
             Some("/user.slice/x.scope")
         );
         assert_eq!(cgroup2_path("12:cpu:/docker/abc\n"), None);
+    }
+
+    #[test]
+    fn release_arch_suffix() {
+        assert_eq!(release_arch("3.10.0-1160.el7.x86_64\n"), Some("x86_64"));
+        assert_eq!(release_arch("7.1.10-200.fc44.aarch64"), Some("aarch64"));
+        assert_eq!(release_arch("6.8.0-45-generic"), None);
+        assert_eq!(release_arch(""), None);
     }
 
     #[test]
