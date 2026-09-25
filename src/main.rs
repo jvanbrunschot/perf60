@@ -27,7 +27,7 @@ fn main() -> ExitCode {
         return ExitCode::from(3);
     }
 
-    let r = perf60::analyze(&FsSource::root(), opts.interval, opts.count);
+    let r = perf60::analyze_with(&FsSource::root(), opts.interval, opts.count, opts.deep);
     let out = if opts.json {
         report::json::render(&r)
     } else {

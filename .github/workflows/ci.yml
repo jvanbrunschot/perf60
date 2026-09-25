@@ -69,11 +69,26 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Read the pinned eBPF nightly from build.rs
+        run: |
+          echo "EBPF_TOOLCHAIN=$(sed -n 's/^const EBPF_TOOLCHAIN: &str = "\(.*\)";/\1/p' build.rs)" >> "$GITHUB_ENV"
+      # Installed first: dtolnay/rust-toolchain makes the last installed toolchain the default.
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          toolchain: ${{ env.EBPF_TOOLCHAIN }}
+          components: rust-src
       - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
         with:
           targets: ${{ matrix.target }}
+          components: clippy
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
-          key: ${{ matrix.target }}
-      - name: Run in minimal containers (alpine, debian-slim, busybox)
-        run: scripts/verify.sh ${{ matrix.target }}
+          key: ${{ matrix.target }}-deep
+      - name: Install pinned bpf-linker (checksum-verified release binary)
+        run: |
+          scripts/install-bpf-linker.sh "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Clippy with the eBPF probes
+        run: cargo clippy --locked --features deep --target ${{ matrix.target }} -- -D warnings
+      - name: Run in minimal containers (alpine, debian-slim, busybox), plus privileged --deep
+        run: scripts/verify.sh --deep ${{ matrix.target }}

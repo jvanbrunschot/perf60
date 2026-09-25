@@ -8,7 +8,7 @@ their status, and how the overall report and exit code are produced.
 
 ### Requirement: Command-line interface
 The tool SHALL accept `--interval <seconds>` (default 1, a positive number), `--count <n>`
-(default 5, integer ≥ 1), `--json`, `--no-color`, `-v/--verbose`, `-h/--help` and
+(default 5, integer ≥ 1), `--json`, `--no-color`, `-v/--verbose`, `--deep`, `-h/--help` and
 `-V/--version`. Invalid or unknown arguments SHALL print an error with usage to stderr and exit
 with code 3.
 
@@ -23,6 +23,10 @@ with code 3.
 #### Scenario: Verbose flag
 - **WHEN** perf60 is run with `-v`
 - **THEN** the text report includes detail lines for every section
+
+#### Scenario: Deep flag
+- **WHEN** perf60 is run with `--deep`
+- **THEN** the eBPF probe sections are added to the report
 
 ### Requirement: No external commands
 The tool SHALL NOT execute any external program. All data SHALL come from files under

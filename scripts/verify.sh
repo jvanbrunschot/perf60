@@ -1,8 +1,15 @@
 #!/bin/sh
 # End-to-end check: build a static musl binary and run it in minimal containers that have no
-# procps/sysstat. Usage: scripts/verify.sh [target-triple]   (default: matches the docker arch)
+# procps/sysstat.
+# Usage: scripts/verify.sh [--deep] [target-triple]   (default target: matches the docker arch)
+#   --deep  build with the eBPF probes (feature `deep`) and add a privileged `--deep` run whose
+#           probe sections must not be SKIPPED. On Linux this needs the pinned nightly and
+#           bpf-linker (see CI); on macOS the binary is built by scripts/build-deep.sh.
 set -eu
 cd "$(dirname "$0")/.."
+
+deep=0
+if [ "${1:-}" = "--deep" ]; then deep=1; shift; fi
 
 case "$(docker info --format '{{.Architecture}}' 2>/dev/null)" in
   x86_64|amd64) default=x86_64-unknown-linux-musl ;;
@@ -15,7 +22,13 @@ case "$target" in
   *) echo "unsupported target $target"; exit 3 ;;
 esac
 
-cargo build --locked --release --target "$target"
+if [ "$deep" = 1 ] && [ "$(uname -s)" != Linux ]; then
+  scripts/build-deep.sh "$target"
+elif [ "$deep" = 1 ]; then
+  cargo build --locked --release --features deep --target "$target"
+else
+  cargo build --locked --release --target "$target"
+fi
 bin="target/$target/release/perf60"
 file "$bin" | grep -Eq "static(-pie)? linked|statically linked" || { echo "FAIL: $bin is not statically linked"; exit 1; }
 
@@ -54,5 +67,14 @@ done
 
 echo "=== alpine (privileged, kernel log readable)"
 run alpine --privileged -- --interval 0.5 --count 1 --no-color
+
+if [ "$deep" = 1 ]; then
+  echo "=== alpine (privileged, --deep)"
+  run alpine --privileged -- --deep --interval 0.5 --count 2 --no-color
+  echo "$LAST_OUT" | grep -q "^\[.*\] execsnoop" || { echo "FAIL: no execsnoop section"; fail=1; }
+  if echo "$LAST_OUT" | grep -E "^\[SKIP\] (deep|execsnoop|runqlat|biolatency|tcpretrans) "; then
+    echo "FAIL: an eBPF probe was SKIPPED"; fail=1
+  fi
+fi
 
 [ "$fail" -eq 0 ] && echo "verify: PASS" || { echo "verify: FAIL"; exit 1; }
