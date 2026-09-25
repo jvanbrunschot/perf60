@@ -25,7 +25,11 @@ plus an OK/WARN/CRIT report.
   spec and a unit test.
 - **Every section has a resource.** `Section::new(id, title, equivalent, Resource::…)`. The
   resource (cpu, memory, disk, network, capacity, hardware, kernel, pressure) drives the
-  diagnosis.
+  "Likely bottleneck" diagnosis (`src/report/diagnosis.rs`).
+- **Findings about another resource say so.** Use `warn_on`/`crit_on`/`note_on`/`threshold_on`
+  with the resource they concern, e.g. iowait in the cpu section is `Resource::Disk`. Keep the
+  number early in the message (`what 42%: why`), since the diagnosis quotes that leading
+  part as evidence.
 - **Fixture trees:**
   - `tests/fixtures/linux-arm64` is captured with `scripts/capture-fixture.sh linux-arm64`.
   - `tests/fixtures/linux-legacy` is synthetic, with old-kernel formats (see its README).

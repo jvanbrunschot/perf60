@@ -85,6 +85,17 @@ const RULES: &[Rule] = &[
     rule("call trace", Warn, &["call trace"], &[]),
 ];
 
+/// The resource a kernel log event is about (the diagnosis groups findings by resource).
+fn label_resource(label: &str) -> Resource {
+    match label {
+        "OOM kill" => Resource::Memory,
+        "I/O error" | "filesystem error" | "storage reset/timeout" => Resource::Disk,
+        "hardware error" | "memory failure" => Resource::Hardware,
+        "SYN flood" | "conntrack table full" | "link down" => Resource::Network,
+        _ => Resource::Kernel,
+    }
+}
+
 /// `needle` occurs in `hay` at a position not preceded by an ASCII letter or digit.
 fn has_word(hay: &str, needle: &str) -> bool {
     hay.match_indices(needle)
@@ -243,11 +254,11 @@ fn evaluate(mut s: Section, records: &[Record], uptime: Option<f64>) -> Section 
             match g.severity {
                 Crit => {
                     recent_crit += g.recent.len();
-                    s.crit(msg);
+                    s.crit_on(label_resource(g.label), msg);
                 }
                 Warn => {
                     recent_warn += g.recent.len();
-                    s.warn(msg);
+                    s.warn_on(label_resource(g.label), msg);
                 }
             }
         }

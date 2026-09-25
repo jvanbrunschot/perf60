@@ -70,6 +70,10 @@ pub enum Level {
 pub struct Finding {
     pub level: Level,
     pub message: String,
+    /// Set when the finding concerns another resource than its section, e.g. PSI io pressure
+    /// (disk) or an OOM kill in the kernel log (memory). Used by the diagnosis.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource: Option<Resource>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -125,32 +129,73 @@ impl Section {
     }
 
     pub fn note(&mut self, msg: impl Into<String>) {
-        self.push(Level::Note, msg.into());
+        self.push(Level::Note, msg.into(), None);
     }
 
     pub fn warn(&mut self, msg: impl Into<String>) {
-        self.push(Level::Warn, msg.into());
+        self.push(Level::Warn, msg.into(), None);
     }
 
     pub fn crit(&mut self, msg: impl Into<String>) {
-        self.push(Level::Crit, msg.into());
+        self.push(Level::Crit, msg.into(), None);
+    }
+
+    /// Like [`Section::note`], for a finding about `resource` rather than the section's own.
+    pub fn note_on(&mut self, resource: Resource, msg: impl Into<String>) {
+        self.push(Level::Note, msg.into(), Some(resource));
+    }
+
+    pub fn warn_on(&mut self, resource: Resource, msg: impl Into<String>) {
+        self.push(Level::Warn, msg.into(), Some(resource));
+    }
+
+    pub fn crit_on(&mut self, resource: Resource, msg: impl Into<String>) {
+        self.push(Level::Crit, msg.into(), Some(resource));
+    }
+
+    /// The resource a finding is about: its own tag, else the section's resource.
+    pub fn resource_of(&self, f: &Finding) -> Resource {
+        f.resource.unwrap_or(self.resource)
     }
 
     /// Record a finding at WARN or CRIT depending on which threshold `value` crosses (if any).
     /// Returns true when a finding was recorded.
     pub fn threshold(&mut self, value: f64, warn: f64, crit: f64, msg: impl Into<String>) -> bool {
+        self.threshold_impl(value, warn, crit, msg.into(), None)
+    }
+
+    /// Like [`Section::threshold`], for a finding about `resource`.
+    pub fn threshold_on(
+        &mut self,
+        resource: Resource,
+        value: f64,
+        warn: f64,
+        crit: f64,
+        msg: impl Into<String>,
+    ) -> bool {
+        self.threshold_impl(value, warn, crit, msg.into(), Some(resource))
+    }
+
+    fn threshold_impl(
+        &mut self,
+        value: f64,
+        warn: f64,
+        crit: f64,
+        msg: String,
+        resource: Option<Resource>,
+    ) -> bool {
         if value > crit {
-            self.crit(msg);
+            self.push(Level::Crit, msg, resource);
             true
         } else if value > warn {
-            self.warn(msg);
+            self.push(Level::Warn, msg, resource);
             true
         } else {
             false
         }
     }
 
-    fn push(&mut self, level: Level, message: String) {
+    fn push(&mut self, level: Level, message: String, resource: Option<Resource>) {
         let escalate = match level {
             Level::Note => Status::Ok,
             Level::Warn => Status::Warn,
@@ -159,7 +204,11 @@ impl Section {
         if self.status != Status::Skipped && escalate.severity() > self.status.severity() {
             self.status = escalate;
         }
-        self.findings.push(Finding { level, message });
+        self.findings.push(Finding {
+            level,
+            message,
+            resource,
+        });
     }
 }
 

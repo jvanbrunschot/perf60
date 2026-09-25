@@ -63,6 +63,17 @@ perf60 [OPTIONS]
   -v, --verbose             Show detail lines for every section, not only problems
 ```
 
+Under the overall status, perf60 names the **likely bottleneck**. It groups every warning by
+the resource it concerns and quotes the strongest evidence from different sections, e.g.:
+
+```
+OVERALL: CRIT  (3 critical, 1 skipped)
+Likely bottleneck: disk I/O
+  · cpu: iowait 67%
+  · disk: vda saturated: %util 90.8% (peak 91%)
+  · pressure: io some pressure 90.5% of the window
+```
+
 The text report shows one line per check. Detail lines only appear for sections that need
 attention, unless you pass `-v`. `--json` always includes every metric, detail and finding.
 
