@@ -4,7 +4,7 @@
 use std::collections::BTreeMap;
 use std::io;
 
-use crate::check::{Check, Context, SampleError, Section, rate};
+use crate::check::{Check, Context, Resource, SampleError, Section, rate};
 use crate::procfs::net_dev::{self, IfStats};
 use crate::procfs::snmp::{self, Snmp};
 use crate::source::Source;
@@ -104,7 +104,12 @@ impl Check for NetDev {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("net", "Network interfaces", "sar -n DEV 1");
+        let s = Section::new(
+            "net",
+            "Network interfaces",
+            "sar -n DEV 1",
+            Resource::Network,
+        );
         let Some((first, last)) = self.window.ends() else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };
@@ -276,7 +281,7 @@ impl Check for Tcp {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("tcp", "TCP", "sar -n TCP,ETCP 1");
+        let s = Section::new("tcp", "TCP", "sar -n TCP,ETCP 1", Resource::Network);
         let Some((first, last)) = self.snmp.ends() else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };

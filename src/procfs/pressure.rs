@@ -78,20 +78,20 @@ mod tests {
             "../../tests/fixtures/linux-arm64/proc/pressure/cpu"
         ))
         .unwrap();
-        assert_eq!(cpu.some.total, 18561780);
+        assert_eq!(cpu.some.total, 39648496);
         assert_eq!(cpu.full.unwrap().total, 0);
         let mem = parse(include_str!(
             "../../tests/fixtures/linux-arm64/proc/pressure/memory"
         ))
         .unwrap();
-        assert_eq!(mem.some.total, 225);
-        assert_eq!(mem.full.unwrap().total, 170);
+        assert_eq!(mem.some.total, 133684);
+        assert_eq!(mem.full.unwrap().total, 129318);
         let io = parse(include_str!(
             "../../tests/fixtures/linux-arm64/proc/pressure/io"
         ))
         .unwrap();
-        assert_eq!(io.some.total, 1775149);
-        assert_eq!(io.full.unwrap().total, 1659609);
+        assert_eq!(io.some.total, 3718332);
+        assert_eq!(io.full.unwrap().total, 3248698);
     }
 
     #[test]

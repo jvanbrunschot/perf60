@@ -137,22 +137,22 @@ mod tests {
         assert_eq!(
             s.total,
             CpuTimes {
-                user: 13120,
+                user: 26210,
                 nice: 2,
-                system: 11810,
-                idle: 6021544,
-                iowait: 367,
-                irq: 14428,
-                softirq: 4610,
+                system: 19425,
+                idle: 7783341,
+                iowait: 857,
+                irq: 20523,
+                softirq: 6597,
                 ..Default::default()
             }
         );
         assert_eq!(s.cpus.len(), 4);
         assert_eq!(s.cpus[2].0, 2);
-        assert_eq!(s.cpus[0].1.user, 3251);
+        assert_eq!(s.cpus[0].1.user, 6007);
         assert_eq!(s.cpus[3].1.nice, 1);
-        assert_eq!(s.ctxt, Some(6111240));
-        assert_eq!(s.intr, Some(6038201));
+        assert_eq!(s.ctxt, Some(11879317));
+        assert_eq!(s.intr, Some(10375061));
         assert_eq!(s.procs_running, Some(1));
         assert_eq!(s.procs_blocked, Some(0));
     }

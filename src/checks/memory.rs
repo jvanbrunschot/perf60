@@ -1,7 +1,7 @@
 //! `free -m` and the si/so columns of `vmstat 1`: available memory against RAM and the cgroup
 //! limit, OOM kills, and swapping during the sampling window.
 
-use crate::check::{Check, Context, SampleError, Section, rate};
+use crate::check::{Check, Context, Resource, SampleError, Section, rate};
 use crate::procfs::meminfo::{self, MemInfo};
 use crate::procfs::system;
 use crate::procfs::vmstat::{self, VmStat};
@@ -104,7 +104,7 @@ impl Check for Memory {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("memory", "Memory", "free -m");
+        let s = Section::new("memory", "Memory", "free -m", Resource::Memory);
         let Some(m) = &self.mem else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };
@@ -350,7 +350,7 @@ impl Check for Swap {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("swap", "Swapping", "vmstat 1 (si/so)");
+        let s = Section::new("swap", "Swapping", "vmstat 1 (si/so)", Resource::Memory);
         let (Some(first), Some(last)) = (&self.first, &self.last) else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };
@@ -476,9 +476,9 @@ mod tests {
         assert_eq!(s.status, Status::Ok);
         assert_eq!(
             s.summary,
-            "available 1.4 GiB of 1.9 GiB (74%), buffers 1.3 MiB, cached 440 MiB, swap 0 B/0 B"
+            "available 1.3 GiB of 1.9 GiB (69%), buffers 204 KiB, cached 1.2 GiB, swap 0 B/0 B"
         );
-        assert!(s.details[0].contains("shared 1.1 MiB"), "{:?}", s.details);
+        assert!(s.details[0].contains("shared 1 MiB"), "{:?}", s.details);
         assert_eq!(s.metrics["total_bytes"], 1986320.0 * 1024.0);
         assert_eq!(s.metrics["swap_used_bytes"], 0.0);
         assert!(!s.metrics.contains_key("cgroup_used_pct"));

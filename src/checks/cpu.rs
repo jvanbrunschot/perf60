@@ -1,7 +1,7 @@
 //! `vmstat 1` and `mpstat -P ALL 1`: where CPU time goes, run-queue saturation and per-CPU
 //! balance, all from `/proc/stat` deltas over the sampling window.
 
-use crate::check::{Check, Context, SampleError, Section, rate};
+use crate::check::{Check, Context, Resource, SampleError, Section, rate};
 use crate::procfs::stat::{self, CpuTimes, Stat};
 use crate::source::Source;
 use crate::units;
@@ -120,7 +120,7 @@ impl Check for Cpu {
     }
 
     fn evaluate(&self, ctx: &Context) -> Section {
-        let s = Section::new("cpu", "CPU utilization", "vmstat 1");
+        let s = Section::new("cpu", "CPU utilization", "vmstat 1", Resource::Cpu);
         match self.samples.window() {
             Ok(w) => evaluate_cpu(s, w, ctx.cpus(), ctx.sys.cpus_online.max(1) as f64),
             Err(reason) => s.skipped(reason),
@@ -246,7 +246,12 @@ impl Check for CpuBalance {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("cpu-balance", "Per-CPU balance", "mpstat -P ALL 1");
+        let s = Section::new(
+            "cpu-balance",
+            "Per-CPU balance",
+            "mpstat -P ALL 1",
+            Resource::Cpu,
+        );
         match self.samples.window() {
             Ok(w) => evaluate_balance(s, &w[0].1, &w[w.len() - 1].1),
             Err(reason) => s.skipped(reason),

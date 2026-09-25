@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::check::{Check, Context, SampleError, Section};
+use crate::check::{Check, Context, Resource, SampleError, Section};
 use crate::procfs::pid_stat;
 use crate::source::Source;
 use crate::units;
@@ -122,7 +122,7 @@ impl Check for Processes {
     }
 
     fn evaluate(&self, ctx: &Context) -> Section {
-        let s = Section::new("processes", "Top processes", "pidstat 1");
+        let s = Section::new("processes", "Top processes", "pidstat 1", Resource::Cpu);
         if self.scans == 0 {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         }

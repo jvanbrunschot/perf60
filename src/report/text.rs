@@ -178,12 +178,12 @@ fn trim_float(v: f64) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::check::Section;
+    use crate::check::{Resource, Section};
     use crate::report::Sampling;
     use crate::sysinfo::SysInfo;
 
     fn report() -> Report {
-        let mut warn = Section::new("disk", "Disk I/O", "iostat -xz 1");
+        let mut warn = Section::new("disk", "Disk I/O", "iostat -xz 1", Resource::Disk);
         warn.summary("vda util 93%");
         warn.detail("vda r/s 10 w/s 900");
         warn.warn("vda saturated");
@@ -204,7 +204,7 @@ mod tests {
                 interval: 0.5,
                 count: 4,
             },
-            vec![Section::new("load", "Load", "uptime"), warn],
+            vec![Section::new("load", "Load", "uptime", Resource::Cpu), warn],
         )
     }
 
@@ -226,7 +226,7 @@ mod tests {
     }
 
     fn section(id: &'static str, warn: bool) -> Section {
-        let mut s = Section::new(id, "T", "t");
+        let mut s = Section::new(id, "T", "t", Resource::Kernel);
         s.summary("sum");
         s.detail("detail line");
         s.note("a note");

@@ -1,0 +1,5 @@
+NAME="CentOS Linux"
+VERSION="7 (Core)"
+ID="centos"
+VERSION_ID="7"
+PRETTY_NAME="CentOS Linux 7 (Core)"

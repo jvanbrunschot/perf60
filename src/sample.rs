@@ -25,7 +25,7 @@ pub fn run(checks: &mut [Box<dyn Check>], src: &dyn Source, interval: f64, count
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::check::{Context, Section};
+    use crate::check::{Context, Resource, Section};
     use crate::source::MemSource;
 
     #[test]
@@ -39,7 +39,7 @@ mod tests {
                 self.0.borrow_mut().push(t);
             }
             fn evaluate(&self, _: &Context) -> Section {
-                Section::new("times", "Times", "-")
+                Section::new("times", "Times", "-", Resource::Kernel)
             }
         }
         let seen = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));

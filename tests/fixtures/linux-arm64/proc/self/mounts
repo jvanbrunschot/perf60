@@ -1,0 +1,13 @@
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev tmpfs rw,context="system_u:object_r:container_file_t:s0:c1022,c1023",nosuid,size=65536k,mode=755,inode64 0 0
+sysfs /sys sysfs rw,seclabel,nosuid,nodev,noexec,relatime 0 0
+devpts /dev/pts devpts rw,context="system_u:object_r:container_file_t:s0:c1022,c1023",nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0
+mqueue /dev/mqueue mqueue rw,seclabel,nosuid,nodev,noexec,relatime 0 0
+tmpfs /run/secrets tmpfs rw,seclabel,size=397264k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /etc/hostname tmpfs rw,seclabel,size=397264k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /etc/resolv.conf tmpfs rw,seclabel,size=397264k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /etc/hosts tmpfs rw,seclabel,size=397264k,nr_inodes=819200,mode=755,inode64 0 0
+shm /dev/shm tmpfs rw,context="system_u:object_r:container_file_t:s0:c1022,c1023",nosuid,nodev,noexec,relatime,size=64000k,inode64 0 0
+tmpfs /run/.containerenv tmpfs rw,seclabel,size=397264k,nr_inodes=819200,mode=755,inode64 0 0
+cgroup /sys/fs/cgroup cgroup2 rw,seclabel,nosuid,nodev,noexec,relatime 0 0
+overlay / overlay rw,context="system_u:object_r:container_file_t:s0:c1022,c1023",relatime,lowerdir=/var/lib/containers/storage/overlay/l/65D3EQO3NF7BFWWLRPU6KR2X76,upperdir=/var/lib/containers/storage/overlay/dcfb35a2c536fe5ba84d6f7038e5e78f992cfb82885dfd3324bb2b12a57a835c/diff,workdir=/var/lib/containers/storage/overlay/dcfb35a2c536fe5ba84d6f7038e5e78f992cfb82885dfd3324bb2b12a57a835c/work,redirect_dir=on,uuid=on,metacopy=on,fsync=volatile 0 0
