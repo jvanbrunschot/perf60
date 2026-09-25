@@ -10,6 +10,7 @@ pub mod meminfo;
 pub mod mounts;
 pub mod net_dev;
 pub mod pid_stat;
+pub mod platform;
 pub mod pressure;
 pub mod schedstat;
 pub mod snmp;
