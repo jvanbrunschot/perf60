@@ -11,6 +11,7 @@ pub mod memory;
 pub mod net;
 pub mod pressure;
 pub mod processes;
+pub mod sockets;
 
 pub fn all() -> Vec<Box<dyn Check>> {
     vec![
@@ -25,5 +26,6 @@ pub fn all() -> Vec<Box<dyn Check>> {
         Box::new(net::NetDev::default()),           // sar -n DEV 1
         Box::new(net::Tcp::default()),              // sar -n TCP,ETCP 1
         Box::new(pressure::Pressure::default()),    // top / PSI
+        Box::new(sockets::Sockets::default()),      // ss -s / conntrack
     ]
 }

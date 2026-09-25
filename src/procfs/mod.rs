@@ -9,6 +9,7 @@ pub mod net_dev;
 pub mod pid_stat;
 pub mod pressure;
 pub mod snmp;
+pub mod sockstat;
 pub mod stat;
 pub mod system;
 pub mod vmstat;
