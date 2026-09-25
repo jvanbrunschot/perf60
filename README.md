@@ -75,15 +75,30 @@ from monitoring and scripts, e.g. `perf60 -c 3 --json > /var/tmp/perf60.json || 
 |---|---|---|---|
 | `load` | `uptime` | `/proc/loadavg` | load1 > CPUs (WARN), > 2× CPUs (CRIT); rising/falling trend |
 | `kernel-log` | `dmesg \| tail` | `/dev/kmsg`, falls back to `klogctl(2)` | OOM kills, hung tasks, I/O and filesystem errors, panics, lockups, MCE (CRIT); SYN floods, segfaults, conntrack full, link down, storage resets (WARN). Only events in the last hour escalate. |
-| `cpu` | `vmstat 1` | `/proc/stat` | run queue > CPUs when busy; iowait > 20/50%; steal > 10/25%; busy > 90% |
+| `cpu` | `vmstat 1` | `/proc/stat`, `/proc/schedstat` | run queue > CPUs when busy; average run-queue wait > 2/10 ms; iowait > 20/50%; steal > 10/25%; busy > 90% |
 | `cpu-balance` | `mpstat -P ALL 1` | `/proc/stat` | one CPU > 90% while the mean is < 50% (single-thread or IRQ bottleneck) |
-| `processes` | `pidstat 1` | `/proc/<pid>/stat` | top 5 by CPU; one process > 90% of capacity; D-state tasks > CPUs; > 50 zombies |
+| `processes` | `pidstat 1` | `/proc/<pid>/stat`, `/proc/stat` | top 5 by CPU; one process > 90% of capacity; D-state tasks > CPUs; > 50 zombies; fork rate > 100/s (note) or > 1000/s (short-lived process storms) |
 | `disk` | `iostat -xz 1` | `/proc/diskstats` | %util > 60/90; await > 10/50 ms (SSD) or 50/200 ms (HDD) |
-| `memory` | `free -m` | `/proc/meminfo`, cgroup files, `/proc/vmstat` | available < 10/5%; cgroup working set > 90/95% of its limit; OOM kills in the window |
+| `memory` | `free -m` | `/proc/meminfo`, cgroup files, `/proc/vmstat` | available < 10/5%; cgroup working set > 90/95% of its limit; OOM kills in the window; page-cache refaults > 1000/s (thrashing); compaction stalls, NUMA misses (notes) |
 | `swap` | `vmstat 1` si/so | `/proc/vmstat` | any swapping (WARN), > 256 pages/s (CRIT) |
-| `net` | `sar -n DEV 1` | `/proc/net/dev`, `/sys/class/net` | utilization > 70/90% of link speed; errors or drops |
-| `tcp` | `sar -n TCP,ETCP 1` | `/proc/net/snmp`, `/proc/net/netstat` | retransmits > 1/5% of segments sent; listen queue overflows |
+| `net` | `sar -n DEV 1` | `/proc/net/dev`, `/sys/class/net`, `/proc/net/softnet_stat`, `/proc/softirqs` | utilization > 70/90% of link speed; errors or drops; backlog drops (softnet); NAPI squeeze and NET_RX on one CPU (notes) |
+| `tcp` | `sar -n TCP,ETCP 1` | `/proc/net/snmp`, `/proc/net/netstat` | retransmits > 1/5% of segments sent; listen queue overflows; UDP buffer/input errors; TCP backlog drops and aborts on memory |
 | `pressure` | `top` (PSI) | `/proc/pressure/*`, cgroup `*.pressure` | CPU, memory or I/O stall > 10/25% of the window; memory or I/O full stall > 5% |
+
+### Beyond the 2015 checklist
+
+The article predates containers, cgroup v2, PSI and modern NVMe, and it doesn't look at
+capacity limits or hardware health. These sections cover what commonly takes systems down
+today:
+
+| Section | Replaces | Source | Flags |
+|---|---|---|---|
+| `cgroup` | `cat cpu.stat memory.events` | own cgroup (v2, or v1 `cpu,cpuacct`/`memory`) | CPU quota throttling > 10/25% of periods; `oom_kill` (CRIT), `memory.max` hits (WARN), `memory.high` (note) |
+| `cgroups-top` | `systemd-cgtop` | `/sys/fs/cgroup` tree | top 5 leaf cgroups by CPU and memory; any cgroup throttled > 25% (e.g. Kubernetes pods on a node) |
+| `sockets` | `ss -s`, `conntrack -S` | `/proc/net/sockstat{,6}`, `nf_conntrack_*`, TCP sysctls | conntrack table > 80/90%; TIME_WAIT > 50% of the ephemeral port range; orphans > 50%; TCP memory > 80% of `tcp_mem` |
+| `filesystems` | `df -h`, `df -i` | `/proc/self/mounts`, `statvfs(3)` | space or inodes > 85/95%; unexpected read-only mounts. Network and FUSE filesystems are never stat'ed, since that can hang |
+| `limits` | `ulimit -n`, `file-nr` | `/proc/sys/fs/file-nr`, `pid_max`, `threads-max`, cgroup `pids.*`, `/proc/<pid>/limits` | fds, tasks and cgroup pids > 80/90%; a process above 90% of its open-files limit |
+| `hardware` | `edac-util`, `cpupower`, `chronyc tracking` | EDAC, `thermal_throttle`, cpufreq, `/proc/sys/kernel/tainted`, `adjtimex(2)` | uncorrectable memory errors, machine checks (CRIT); new corrected errors, thermal throttling, oops/soft lockup taint, unsynchronized clock (WARN); powersave governor (note) |
 
 CPU thresholds use *effective* CPUs, meaning online CPUs lowered to the cgroup CPU quota.
 Memory checks also take the cgroup memory limit into account, so the report means the same
