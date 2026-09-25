@@ -1,0 +1,8 @@
+{
+  "name": "perf60-openspec-tooling",
+  "private": true,
+  "description": "Pinned OpenSpec CLI for CI (installed with npm ci --ignore-scripts)",
+  "dependencies": {
+    "@fission-ai/openspec": "1.13.2"
+  }
+}
