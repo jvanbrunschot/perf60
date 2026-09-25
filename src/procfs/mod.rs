@@ -1,6 +1,7 @@
 //! Pure parsers for kernel text interfaces. No I/O here: every function takes the file content
 //! as `&str` so it can be tested against fixtures on any OS.
 
+pub mod cgroup;
 pub mod diskstats;
 pub mod kmsg;
 pub mod limits;
