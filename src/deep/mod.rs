@@ -9,6 +9,7 @@
 use crate::check::{Check, Context, Resource, Section};
 use crate::source::Source;
 
+pub mod biolatency;
 pub mod btf;
 pub mod caps;
 pub mod execsnoop;
@@ -25,6 +26,7 @@ pub fn checks() -> Vec<Box<dyn Check>> {
         vec![
             Box::new(execsnoop::Execsnoop::default()),
             Box::new(runqlat::Runqlat::default()),
+            Box::new(biolatency::Biolatency::default()),
             Box::new(tcpretrans::Tcpretrans::default()),
         ]
     }

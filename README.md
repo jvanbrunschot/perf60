@@ -125,6 +125,7 @@ The kernel aggregates events during the sampling window and perf60 reads the tot
 |---|---|---|
 | `execsnoop` | `execsnoop` | new processes by command, including the short-lived ones `pidstat` never sees; > 100 execs/s warns |
 | `runqlat` | `runqlat` | run queue latency distribution: how long runnable tasks wait for a CPU (p50/p99/max); p99 > 10 ms warns, > 50 ms is critical |
+| `biolatency` | `biolatency -D` | block I/O latency histogram per disk, issue to completion; p99 > 20 ms warns and > 100 ms is critical (rotational: 100 ms / 500 ms) |
 | `tcpretrans` | `tcpretrans` | TCP retransmits by remote endpoint (`10.0.0.5:443`, `[2001:db8::1]:443`); a note when one endpoint has > 50% of ≥ 20 retransmits, > 100 retransmits/s warns |
 
 `--deep` needs root, or `CAP_BPF` + `CAP_PERFMON` (kernel 5.8+); in a container, use
