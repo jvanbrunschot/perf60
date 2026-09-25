@@ -118,6 +118,9 @@ Project context and rules for artifacts are in `openspec/config.yaml`.
   Changing CI job names means updating the required checks in the `main` ruleset too.
 
 ### Releases
+- Use the **`/release` skill** (`.claude/skills/release/SKILL.md`). It covers the version choice,
+  the release PR, merge and tag, watching the workflow and verifying the published assets. The
+  bullets below are the underlying rules.
 - Bump `version` in `Cargo.toml` in a PR (e.g. `chore(release): 0.2.0`). After it is merged, tag
   `main` with a matching tag and push it: `git tag v0.2.0 && git push origin v0.2.0`.
 - `.github/workflows/release.yml` checks that the tag equals `v<Cargo.toml version>` and reruns
