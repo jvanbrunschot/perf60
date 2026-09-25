@@ -10,7 +10,7 @@ spec header. It reads `/proc`, `/sys` and `/dev/kmsg` directly and never runs an
 command. That means it works on minimal servers and containers without procps or sysstat.
 
 ```
-perf60 0.1.0 · web01 · Linux 6.8.0 · Ubuntu 24.04 · x86_64 · 8 cpus · 16 GiB RAM · KVM · up 12d 3h04m · sampled 5×1s
+perf60 0.2.0 · web01 · Linux 6.8.0 · Ubuntu 24.04 · x86_64 · 8 cpus · 16 GiB RAM · KVM · up 12d 3h04m · sampled 5×1s
   cpu     Intel(R) Xeon(R) Platinum 8375C CPU @ 2.90GHz
   swap    none
   disks   nvme0n1 100 GiB ssd
@@ -41,7 +41,7 @@ Download the binary for your architecture from the
 and run it:
 
 ```sh
-v=0.1.0 arch=x86_64   # or aarch64
+v=0.2.0 arch=x86_64   # or aarch64
 base=https://github.com/jvanbrunschot/perf60/releases/download/v$v
 curl -LO $base/perf60-$v-$arch-linux-musl -LO $base/SHA256SUMS
 grep "perf60-$v-$arch-" SHA256SUMS | shasum -a 256 -c -
