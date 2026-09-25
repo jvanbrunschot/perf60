@@ -11,7 +11,7 @@ mkdir -p dist
 for arch in x86_64 aarch64; do
   target="$arch-unknown-linux-musl"
   rustup target list --installed | grep -qx "$target" || rustup target add "$target"
-  cargo build --release --target "$target"
+  cargo build --locked --release --target "$target"
   out="dist/perf60-$version-$arch-linux-musl"
   cp "target/$target/release/perf60" "$out"
   if ! file "$out" | grep -Eq "static(-pie)? linked|statically linked"; then

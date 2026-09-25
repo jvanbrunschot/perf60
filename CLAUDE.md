@@ -55,6 +55,29 @@ Project context and rules for artifacts are in `openspec/config.yaml`.
   feature message, so `main` keeps one commit per feature.
 - Don't push or merge without the user's go-ahead.
 
+### Supply-chain rules (Shai-Hulud-style worms)
+- **Actions:** pin every third-party action to a full 40-hex commit SHA with the version in a
+  comment. The repo enforces SHA pinning and only allows GitHub-owned actions plus
+  `dtolnay/rust-toolchain` and `Swatinem/rust-cache`. A new third-party action must be added to
+  that allow-list (Settings → Actions) in the same PR.
+- **Checkouts and builds:** every checkout sets `persist-credentials: false`, and every cargo
+  command in CI and the scripts uses `--locked`.
+- **npm:** only `tools/openspec/` with its committed lockfile, installed with
+  `npm ci --ignore-scripts`, in the `specs` job that has `permissions: {}`. Never add npm steps
+  to jobs that hold write permissions.
+- **Release job:** the only job with write, `id-token` and `attestations` permissions. It uses no
+  cache and runs no npm.
+- **Dependency updates:** Dependabot proposes updates to actions, npm tooling and cargo only after a
+  7-day cooldown. Review the diff (SHA → tag) before merging.
+- **Repo settings (applied via `gh api`, not in git):**
+  - ruleset `main: PR + green CI`: PR required, the four CI checks must pass and come from GitHub
+    Actions, no force-push or deletion, no bypass
+  - ruleset `release tags: admins only`: create, move and delete of `v*` tags
+  - the actions allow-list with SHA pinning required
+  - approval required before workflows run for all external contributors
+  - workflow token read-only by default
+  Changing CI job names means updating the required checks in the `main` ruleset too.
+
 ### Releases
 - Bump `version` in `Cargo.toml` in a PR (e.g. `chore(release): 0.2.0`). After it is merged, tag
   `main` with a matching tag and push it: `git tag v0.2.0 && git push origin v0.2.0`.

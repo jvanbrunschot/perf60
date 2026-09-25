@@ -45,6 +45,7 @@ v=0.1.0 arch=x86_64   # or aarch64
 base=https://github.com/jvanbrunschot/perf60/releases/download/v$v
 curl -LO $base/perf60-$v-$arch-linux-musl -LO $base/SHA256SUMS
 grep "perf60-$v-$arch-" SHA256SUMS | shasum -a 256 -c -
+gh attestation verify perf60-$v-$arch-linux-musl --repo jvanbrunschot/perf60   # optional: built by CI from this repo
 scp perf60-$v-$arch-linux-musl server:/tmp/perf60
 ssh server 'sudo /tmp/perf60'
 ```
@@ -109,7 +110,8 @@ git tag v0.2.0 && git push origin v0.2.0
 ```
 
 The [release workflow](.github/workflows/release.yml) reruns all CI checks, builds both static
-binaries and publishes them with `SHA256SUMS` as a GitHub release. The tag must equal
+binaries, attests their build provenance, and publishes them with `SHA256SUMS` as a GitHub
+release. The tag must equal
 `v<Cargo.toml version>`. A tag with a suffix such as `v0.2.0-rc.1` becomes a pre-release.
 
 ## Development

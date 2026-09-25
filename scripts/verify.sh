@@ -15,7 +15,7 @@ case "$target" in
   *) echo "unsupported target $target"; exit 3 ;;
 esac
 
-cargo build --release --target "$target"
+cargo build --locked --release --target "$target"
 bin="target/$target/release/perf60"
 file "$bin" | grep -Eq "static(-pie)? linked|statically linked" || { echo "FAIL: $bin is not statically linked"; exit 1; }
 
