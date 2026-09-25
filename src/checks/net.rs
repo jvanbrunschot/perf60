@@ -501,6 +501,14 @@ fn udp_errors(s: &mut Section, a: &Snmp, b: &Snmp) {
     if !b.has_section("Udp") {
         return;
     }
+    let delta = |field: &str| -> u64 {
+        ["Udp", "UdpLite"]
+            .iter()
+            .map(|sec| counter(b, sec, field).saturating_sub(counter(a, sec, field)))
+            .sum()
+    };
+    // Every receive-buffer overflow is also counted in InErrors: only the rest is news.
+    let rcvbuf = delta("RcvbufErrors");
     for (field, metric, what) in [
         (
             "RcvbufErrors",
@@ -515,16 +523,18 @@ fn udp_errors(s: &mut Section, a: &Snmp, b: &Snmp) {
         (
             "InErrors",
             "udp_in_errors",
-            "UDP input errors: datagrams dropped on receive (buffer overflows or bad checksums)",
+            "UDP input errors not caused by buffer overflows (bad checksums or short datagrams)",
         ),
     ] {
-        let n: u64 = ["Udp", "UdpLite"]
-            .iter()
-            .map(|sec| counter(b, sec, field).saturating_sub(counter(a, sec, field)))
-            .sum();
+        let n = delta(field);
         s.metric(metric, n as f64);
-        if n > 0 {
-            s.warn(format!("{what} ({field} +{n} during the window)"));
+        let news = if field == "InErrors" {
+            n.saturating_sub(rcvbuf)
+        } else {
+            n
+        };
+        if news > 0 {
+            s.warn(format!("{what} ({field} +{news} during the window)"));
         }
     }
 }
@@ -982,9 +992,10 @@ mod tests {
 
     #[test]
     fn udp_errors_warn() {
-        let s = run_udp(&snmp_udp((5, 5, 0), None), &snmp_udp((5, 9, 0), None));
+        // The kernel counts an overflow in both RcvbufErrors and InErrors: one finding only.
+        let s = run_udp(&snmp_udp((5, 5, 0), None), &snmp_udp((9, 9, 0), None));
         assert_eq!(s.metrics["udp_rcvbuf_errors"], 4.0);
-        assert_eq!(s.metrics["udp_in_errors"], 0.0);
+        assert_eq!(s.metrics["udp_in_errors"], 4.0);
         assert_eq!(s.status, Status::Warn);
         assert_eq!(s.findings.len(), 1, "{:?}", s.findings);
         assert!(
@@ -997,7 +1008,11 @@ mod tests {
         let s = run_udp(&snmp_udp((0, 0, 0), None), &snmp_udp((2, 0, 0), None));
         assert_eq!(s.metrics["udp_in_errors"], 2.0);
         assert_eq!(s.status, Status::Warn);
-        assert!(s.findings[0].message.contains("InErrors"));
+        assert!(
+            s.findings[0].message.contains("InErrors +2"),
+            "{:?}",
+            s.findings
+        );
         let quiet = snmp_udp((3, 3, 3), Some((1, 1, 1)));
         let s = run_udp(&quiet, &quiet);
         assert_eq!(s.status, Status::Ok);

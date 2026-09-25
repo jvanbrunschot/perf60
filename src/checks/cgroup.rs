@@ -597,6 +597,9 @@ pub struct CgroupsTop {
     /// Cgroups present in the latest walk, keyed by path (`/` = hierarchy root).
     entries: BTreeMap<String, Entry>,
     capped: bool,
+    /// perf60's own cgroup path, resolved on the first sample. The `cgroup` section judges it,
+    /// so it never raises a throttling finding here.
+    own: Option<Option<String>>,
     error: SampleError,
 }
 
@@ -606,6 +609,7 @@ impl Check for CgroupsTop {
     }
 
     fn sample(&mut self, src: &dyn Source, t: f64) {
+        self.own.get_or_insert_with(|| own_cpu_path(src));
         let Some(h) = self
             .hierarchy
             .get_or_insert_with(|| Hierarchy::detect(src))
@@ -756,9 +760,11 @@ impl Check for CgroupsTop {
             s.detail(format!("walk stopped at {MAX_CGROUPS} cgroups"));
         }
 
+        let own = self.own.clone().flatten();
         let mut throttled: Vec<&Row> = rows
             .iter()
             .filter(|r| r.throttled > TOP_THROTTLE_WARN_PCT)
+            .filter(|r| Some(r.path) != own.as_deref())
             .collect();
         throttled.sort_by(|x, y| y.throttled.total_cmp(&x.throttled).then(x.path.cmp(y.path)));
         s.metric("cgroups", n as f64);
@@ -780,6 +786,16 @@ impl Check for CgroupsTop {
             ));
         }
         s
+    }
+}
+
+/// Own cgroup path in the cpu hierarchy (v2 unified path, or the v1 cpu/cpuacct line).
+fn own_cpu_path(src: &dyn Source) -> Option<String> {
+    let text = src.read_to_string("/proc/self/cgroup").ok()?;
+    let lines = cgroup::parse_proc_cgroup(&text).ok()?;
+    match cgroup::own_cgroup(&lines)? {
+        cgroup::OwnCgroup::V2(path) => Some(path),
+        cgroup::OwnCgroup::V1 { cpu, .. } => cpu.map(|(_, path)| path),
     }
 }
 
@@ -1403,6 +1419,38 @@ mod tests {
             "{}",
             s.findings[0].message
         );
+    }
+
+    #[test]
+    fn own_cgroup_not_double_reported() {
+        let mut before = vec![
+            f(&format!("{ROOT}/cgroup.controllers"), "cpu memory\n"),
+            f("/proc/self/cgroup", "0::/\n"),
+        ];
+        before.extend(cg("", 0, 0, 0, Some(MIB)));
+        let after = cg("", 1_000_000, 100, 100, Some(MIB));
+        let s = run::<CgroupsTop>(&before, &after, true);
+        assert_eq!(s.status, Status::Ok, "{:?}", s.findings);
+        assert_eq!(s.metrics["throttled_cgroups"], 0.0);
+        assert!(listed(&s, "/"));
+        // Another throttled leaf is still reported.
+        let mut before = vec![
+            f(&format!("{ROOT}/cgroup.controllers"), "cpu memory\n"),
+            f("/proc/self/cgroup", "0::/me.scope\n"),
+        ];
+        before.extend(cg("", 0, 0, 0, None));
+        before.extend(cg("/me.scope", 0, 0, 0, None));
+        before.extend(cg("/other.scope", 0, 0, 0, None));
+        let mut after = cg("/me.scope", 1000, 100, 100, None);
+        after.extend(cg("/other.scope", 1000, 100, 100, None));
+        let s = run::<CgroupsTop>(&before, &after, false);
+        assert_eq!(s.metrics["throttled_cgroups"], 1.0);
+        assert!(
+            has(&s, Level::Warn, "/other.scope 100%"),
+            "{:?}",
+            s.findings
+        );
+        assert!(!has(&s, Level::Warn, "/me.scope"));
     }
 
     #[test]
