@@ -2,11 +2,16 @@
 //! balance, all from `/proc/stat` deltas over the sampling window.
 
 use crate::check::{Check, Context, Resource, SampleError, Section, rate};
+use crate::procfs::schedstat::{self, SchedStat};
 use crate::procfs::stat::{self, CpuTimes, Stat};
 use crate::source::Source;
 use crate::units;
 
 const PATH: &str = "/proc/stat";
+const SCHEDSTAT: &str = "/proc/schedstat";
+/// Average run-queue wait per timeslice above these many milliseconds is WARN / CRIT.
+const RUNQ_WARN_MS: f64 = 2.0;
+const RUNQ_CRIT_MS: f64 = 10.0;
 
 /// Timestamped `/proc/stat` snapshots. Each check keeps its own (see the core design).
 #[derive(Default)]
@@ -108,6 +113,9 @@ fn count(v: f64) -> String {
 #[derive(Default)]
 pub struct Cpu {
     samples: Samples,
+    /// First and latest readable `/proc/schedstat`. Optional: without it there is no
+    /// run-queue latency, but the section still renders.
+    sched: Option<(SchedStat, SchedStat)>,
 }
 
 impl Check for Cpu {
@@ -117,12 +125,28 @@ impl Check for Cpu {
 
     fn sample(&mut self, src: &dyn Source, t: f64) {
         self.samples.sample(src, t);
+        if let Some(st) = src
+            .read_to_string(SCHEDSTAT)
+            .ok()
+            .and_then(|s| schedstat::parse(&s).ok())
+        {
+            match &mut self.sched {
+                Some((_, last)) => *last = st,
+                None => self.sched = Some((st.clone(), st)),
+            }
+        }
     }
 
     fn evaluate(&self, ctx: &Context) -> Section {
         let s = Section::new("cpu", "CPU utilization", "vmstat 1", Resource::Cpu);
         match self.samples.window() {
-            Ok(w) => evaluate_cpu(s, w, ctx.cpus(), ctx.sys.cpus_online.max(1) as f64),
+            Ok(w) => {
+                let mut s = evaluate_cpu(s, w, ctx.cpus(), ctx.sys.cpus_online.max(1) as f64);
+                if let Some((first, last)) = &self.sched {
+                    runq_latency(&mut s, first, last);
+                }
+                s
+            }
             Err(reason) => s.skipped(reason),
         }
     }
@@ -226,6 +250,49 @@ fn evaluate_cpu(mut s: Section, w: &[(f64, Stat)], cpus: f64, online: f64) -> Se
         ));
     }
     s
+}
+
+/// Run-queue wait per timeslice in ms: `(all CPUs, worst CPU, worst CPU's average)`. `None`
+/// when no CPU ran a timeslice during the window.
+fn runq_wait(first: &SchedStat, last: &SchedStat) -> Option<(f64, usize, f64)> {
+    let (mut delay, mut slices) = (0u64, 0u64);
+    let mut worst: Option<(usize, f64)> = None;
+    for (n, b) in &last.cpus {
+        let Some((_, a)) = first.cpus.iter().find(|(m, _)| m == n) else {
+            continue;
+        };
+        let d = b.run_delay_ns.saturating_sub(a.run_delay_ns);
+        let k = b.timeslices.saturating_sub(a.timeslices);
+        if k == 0 {
+            continue;
+        }
+        delay += d;
+        slices += k;
+        let ms = d as f64 / k as f64 / 1e6;
+        if worst.is_none_or(|(_, w)| ms > w) {
+            worst = Some((*n, ms));
+        }
+    }
+    let (cpu, max) = worst?;
+    Some((delay as f64 / slices as f64 / 1e6, cpu, max))
+}
+
+/// runqlat-lite: how long runnable tasks wait for a CPU, from `/proc/schedstat` deltas.
+fn runq_latency(s: &mut Section, first: &SchedStat, last: &SchedStat) {
+    let Some((avg, cpu, max)) = runq_wait(first, last) else {
+        return;
+    };
+    s.detail(format!(
+        "run queue wait {avg:.2} ms per timeslice, worst cpu{cpu} {max:.2} ms"
+    ));
+    s.metric("runq_wait_ms", avg);
+    s.metric("runq_wait_max_cpu_ms", max);
+    s.threshold(
+        avg,
+        RUNQ_WARN_MS,
+        RUNQ_CRIT_MS,
+        format!("tasks wait {avg:.2} ms for a CPU on average: CPU saturation / run queue latency"),
+    );
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -668,6 +735,102 @@ mod tests {
         assert_eq!(count(3200.0), "3.2k");
         assert_eq!(count(12_000.0), "12k");
         assert_eq!(count(2_500_000.0), "2.5M");
+    }
+
+    // --- cpu: run-queue latency -------------------------------------------------------------
+
+    /// `/proc/schedstat` with `(run_delay ns, timeslices)` per CPU.
+    fn schedstat_text(cpus: &[(u64, u64)]) -> String {
+        let mut s = String::from("version 17\ntimestamp 4314327485\n");
+        for (i, (delay, slices)) in cpus.iter().enumerate() {
+            s += &format!("cpu{i} 0 0 0 0 0 0 5000 {delay} {slices}\ndomain0 MC f 0 0 0\n");
+        }
+        s
+    }
+
+    /// A 1 s window with 10% busy CPUs; each CPU's schedstat grows by `(run_delay, timeslices)`.
+    fn runq(deltas: &[(u64, u64)]) -> Section {
+        let stat = window(&vec![user(10); deltas.len()]);
+        let start: Vec<(u64, u64)> = deltas.iter().map(|_| (BASE, BASE)).collect();
+        let end: Vec<(u64, u64)> = deltas.iter().map(|(d, k)| (BASE + d, BASE + k)).collect();
+        let src = MemSource::new();
+        let mut c = Cpu::default();
+        for (i, (st, sc)) in [(&stat[0], &start), (&stat[1], &end)].iter().enumerate() {
+            src.set(PATH, st);
+            src.set(SCHEDSTAT, &schedstat_text(sc));
+            c.sample(&src, i as f64);
+        }
+        c.evaluate(&ctx(deltas.len()))
+    }
+
+    #[test]
+    fn runq_wait_thresholds() {
+        let s = runq(&[(2_000_000, 1)]);
+        assert_eq!(s.metrics["runq_wait_ms"], 2.0);
+        assert_eq!(s.status, Status::Ok, "{:?}", s.findings);
+        let s = runq(&[(2_010_000, 1)]);
+        assert_eq!(s.status, Status::Warn);
+        assert!(
+            has(&s, Level::Warn, "tasks wait 2.01 ms for a CPU on average"),
+            "{:?}",
+            s.findings
+        );
+        let s = runq(&[(10_000_000, 1)]);
+        assert_eq!(s.status, Status::Warn);
+        let s = runq(&[(10_010_000, 1)]);
+        assert_eq!(s.status, Status::Crit);
+        assert!(
+            has(&s, Level::Crit, "run queue latency"),
+            "{:?}",
+            s.findings
+        );
+    }
+
+    #[test]
+    fn runq_wait_average_and_worst_cpu() {
+        let s = runq(&[(1_000_000, 100), (9_000_000, 100)]);
+        assert_eq!(s.metrics["runq_wait_ms"], 0.05);
+        assert_eq!(s.metrics["runq_wait_max_cpu_ms"], 0.09);
+        assert_eq!(s.status, Status::Ok);
+        assert!(
+            s.details
+                .iter()
+                .any(|d| d == "run queue wait 0.05 ms per timeslice, worst cpu1 0.09 ms"),
+            "{:?}",
+            s.details
+        );
+    }
+
+    #[test]
+    fn runq_wait_needs_timeslices() {
+        let s = runq(&[(0, 0), (0, 0)]);
+        assert!(!s.metrics.contains_key("runq_wait_ms"));
+        assert!(!s.metrics.contains_key("runq_wait_max_cpu_ms"));
+        assert!(!has(&s, Level::Warn, "tasks wait"));
+        assert_eq!(s.status, Status::Ok);
+        // A CPU with no timeslices is left out of the worst-CPU search.
+        let s = runq(&[(5_000_000, 0), (1_000_000, 10)]);
+        assert_eq!(s.metrics["runq_wait_max_cpu_ms"], 0.1);
+    }
+
+    #[test]
+    fn runq_wait_missing_schedstat() {
+        // No schedstat at all: the default helpers never write it.
+        let s = split(10, 0, 0, 0);
+        assert_eq!(s.status, Status::Ok);
+        assert!(!s.metrics.contains_key("runq_wait_ms"));
+        // Version 14 (pre-CFS layout) is not used.
+        let a = base(1);
+        let src = MemSource::new().with(SCHEDSTAT, "version 14\ncpu0 0 0 0 0 0 0 0 0 0 1 2 3\n");
+        let mut c = Cpu::default();
+        src.set(PATH, &stat_text(&a, 0, 0, 1, 0));
+        c.sample(&src, 0.0);
+        src.set(PATH, &stat_text(&plus(&a, &[user(10)]), 0, 0, 1, 0));
+        c.sample(&src, 1.0);
+        let s = c.evaluate(&ctx(1));
+        assert_ne!(s.status, Status::Skipped);
+        assert!(!s.metrics.contains_key("runq_wait_ms"));
+        assert!(s.findings.is_empty(), "{:?}", s.findings);
     }
 
     // --- cpu-balance -------------------------------------------------------------------------

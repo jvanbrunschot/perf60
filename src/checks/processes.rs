@@ -2,8 +2,8 @@
 
 use std::collections::BTreeMap;
 
-use crate::check::{Check, Context, Resource, SampleError, Section};
-use crate::procfs::pid_stat;
+use crate::check::{Check, Context, Resource, SampleError, Section, rate};
+use crate::procfs::{pid_stat, stat};
 use crate::source::Source;
 use crate::units;
 
@@ -13,6 +13,9 @@ const LIST_N: usize = 5;
 /// WARN when one process uses more than this percentage of total CPU capacity.
 const SATURATION_PCT: f64 = 90.0;
 const ZOMBIE_WARN: usize = 50;
+/// Forks per second above these rates are a note / WARN.
+const FORK_NOTE: f64 = 100.0;
+const FORK_WARN: f64 = 1000.0;
 
 /// Clock ticks per second for utime/stime (`USER_HZ`).
 fn clock_ticks_per_sec() -> f64 {
@@ -49,6 +52,8 @@ pub struct Processes {
     hz: f64,
     /// Pids other than our own listed by the last scan (readable or not).
     others_listed: usize,
+    /// `(t, processes)` from `/proc/stat` at the first and the latest sample that had it.
+    forks: Option<((f64, u64), (f64, u64))>,
 }
 
 impl Default for Processes {
@@ -60,6 +65,7 @@ impl Default for Processes {
             own_pid: std::process::id(),
             hz: clock_ticks_per_sec(),
             others_listed: 0,
+            forks: None,
         }
     }
 }
@@ -70,6 +76,16 @@ impl Check for Processes {
     }
 
     fn sample(&mut self, src: &dyn Source, t: f64) {
+        // The fork counter is optional: without it only the fork rate is omitted.
+        if let Some(n) = src
+            .read_to_string("/proc/stat")
+            .ok()
+            .and_then(|s| stat::parse(&s).ok())
+            .and_then(|st| st.processes)
+        {
+            let first = self.forks.map_or((t, n), |(f, _)| f);
+            self.forks = Some((first, (t, n)));
+        }
         let names = match src.read_dir(PROC) {
             Ok(n) => n,
             Err(e) => {
@@ -138,7 +154,7 @@ impl Check for Processes {
                 let mut s = s;
                 s.summary("no other processes visible");
                 s.metric("processes", 0.0);
-                return s;
+                return fork_rate(s, self.forks);
             }
             return s.skipped("no process readable in /proc");
         }
@@ -156,14 +172,15 @@ impl Check for Processes {
                 .map(|(pid, p)| (*pid, p.comm.as_str()))
                 .collect()
         };
-        evaluate(
+        let s = evaluate(
             s,
             current.len(),
             &usage,
             &in_state('D'),
             in_state('Z').len(),
             ctx.cpus(),
-        )
+        );
+        fork_rate(s, self.forks)
     }
 }
 
@@ -279,6 +296,24 @@ fn evaluate(
         s.warn(format!(
             "{zombies} zombie processes (more than {ZOMBIE_WARN}): a parent is not reaping its children"
         ));
+    }
+    s
+}
+
+/// Forks/s over the window from the `/proc/stat` `processes` counter. Processes that start and
+/// exit between two samples never show up in the per-process list, but they are counted here.
+fn fork_rate(mut s: Section, forks: Option<((f64, u64), (f64, u64))>) -> Section {
+    let Some((first, last)) = forks.filter(|(a, b)| b.0 > a.0) else {
+        return s;
+    };
+    let r = rate(first, last);
+    s.metric("forks_per_sec", r);
+    let msg =
+        format!("short-lived processes: {r:.1} forks/s; top-5 misses them, try --deep execsnoop");
+    if r > FORK_WARN {
+        s.warn(msg);
+    } else if r > FORK_NOTE {
+        s.note(msg);
     }
     s
 }
@@ -501,6 +536,82 @@ mod tests {
         let s = run(&z(51), 4);
         assert_eq!(s.status, Status::Warn);
         assert_eq!(s.metrics["zombies"], 51.0);
+    }
+
+    /// Two samples `dt` seconds apart; the `processes` counter grows by `forks`.
+    fn forks(forks: u64, dt: f64) -> Section {
+        let src = MemSource::new()
+            .with("/proc/stat", "cpu 1 0 0 1\nprocesses 5000\n")
+            .with(&path(1), &stat(1, "init", 'S', 0, 0));
+        let mut c = check();
+        c.sample(&src, 0.0);
+        src.set(
+            "/proc/stat",
+            &format!("cpu 1 0 0 1\nprocesses {}\n", 5000 + forks),
+        );
+        c.sample(&src, dt);
+        c.evaluate(&ctx(4))
+    }
+
+    #[test]
+    fn fork_rate_thresholds() {
+        let s = forks(1000, 10.0);
+        assert_eq!(s.metrics["forks_per_sec"], 100.0);
+        assert!(s.findings.is_empty(), "{:?}", s.findings);
+        let s = forks(1001, 10.0);
+        assert_eq!(s.status, Status::Ok);
+        assert!(
+            s.findings.iter().any(|f| f.level == Level::Note
+                && f.message.contains("short-lived processes: 100.1 forks/s")),
+            "{:?}",
+            s.findings
+        );
+        let s = forks(10_000, 10.0);
+        assert_eq!(s.status, Status::Ok);
+        assert_eq!(s.findings[0].level, Level::Note);
+        let s = forks(10_001, 10.0);
+        assert_eq!(s.status, Status::Warn);
+        assert!(
+            s.findings[0].message.contains("short-lived processes"),
+            "{:?}",
+            s.findings
+        );
+        assert_eq!(s.metrics["forks_per_sec"], 1000.1);
+    }
+
+    #[test]
+    fn fork_rate_missing_counter() {
+        // The shared helpers write a `/proc/stat` without a processes line.
+        let s = run(&[(1, "init", 'S', 0)], 4);
+        assert_eq!(s.status, Status::Ok);
+        assert!(!s.metrics.contains_key("forks_per_sec"));
+        // No /proc/stat at all.
+        let src = MemSource::new().with(&path(1), &stat(1, "init", 'S', 0, 0));
+        let mut c = check();
+        c.sample(&src, 0.0);
+        c.sample(&src, 1.0);
+        let s = c.evaluate(&ctx(4));
+        assert_ne!(s.status, Status::Skipped);
+        assert!(!s.metrics.contains_key("forks_per_sec"));
+    }
+
+    #[test]
+    fn fork_rate_when_alone() {
+        let mut c = check();
+        let own = c.own_pid;
+        let src = MemSource::new()
+            .with("/proc/stat", "cpu 1 0 0 1\nprocesses 100\n")
+            .with(
+                &format!("/proc/{own}/stat"),
+                &stat(own, "perf60", 'R', 1, 1),
+            );
+        c.sample(&src, 0.0);
+        src.set("/proc/stat", "cpu 1 0 0 1\nprocesses 2100\n");
+        c.sample(&src, 1.0);
+        let s = c.evaluate(&ctx(4));
+        assert_eq!(s.summary, "no other processes visible");
+        assert_eq!(s.metrics["forks_per_sec"], 2000.0);
+        assert_eq!(s.status, Status::Warn);
     }
 
     #[test]

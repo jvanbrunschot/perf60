@@ -7,12 +7,16 @@ use std::io;
 use crate::check::{Check, Context, Resource, SampleError, Section, rate};
 use crate::procfs::net_dev::{self, IfStats};
 use crate::procfs::snmp::{self, Snmp};
+use crate::procfs::softirqs::{self, SoftIrqs};
+use crate::procfs::softnet::{self, SoftnetRow};
 use crate::source::Source;
 use crate::units;
 
 const DEV: &str = "/proc/net/dev";
 const SNMP: &str = "/proc/net/snmp";
 const NETSTAT: &str = "/proc/net/netstat";
+const SOFTNET: &str = "/proc/net/softnet_stat";
+const SOFTIRQS: &str = "/proc/softirqs";
 
 const UTIL_WARN: f64 = 70.0;
 const UTIL_CRIT: f64 = 90.0;
@@ -20,6 +24,10 @@ const RETRANS_WARN: f64 = 1.0;
 const RETRANS_CRIT: f64 = 5.0;
 /// Fewer segments than this in the window (or since boot) is too little to judge a ratio.
 const MIN_SEGS: u64 = 100;
+/// NET_RX softirqs needed in the window before judging their spread over CPUs.
+const NET_RX_MIN: u64 = 1000;
+/// One CPU handling more than this share of NET_RX gets a note.
+const NET_RX_SHARE_PCT: f64 = 80.0;
 
 /// A timestamped sample and the first/last pair of a window.
 type Sample<T> = (f64, T);
@@ -72,6 +80,9 @@ pub struct NetDev {
     window: Window<Vec<IfStats>>,
     /// Link speed in Mb/s per interface; `None` when unknown (virtual NICs report -1).
     speeds: BTreeMap<String, Option<u64>>,
+    /// Optional per-CPU sources: missing ones only omit their signals.
+    softnet: Window<Vec<SoftnetRow>>,
+    softirqs: Window<SoftIrqs>,
     error: SampleError,
 }
 
@@ -81,6 +92,20 @@ impl Check for NetDev {
     }
 
     fn sample(&mut self, src: &dyn Source, t: f64) {
+        if let Some(rows) = src
+            .read_to_string(SOFTNET)
+            .ok()
+            .and_then(|s| softnet::parse(&s).ok())
+        {
+            self.softnet.push(t, rows);
+        }
+        if let Some(irqs) = src
+            .read_to_string(SOFTIRQS)
+            .ok()
+            .and_then(|s| softirqs::parse(&s).ok())
+        {
+            self.softirqs.push(t, irqs);
+        }
         let Some(s) = self.error.read(src, DEV) else {
             return;
         };
@@ -113,7 +138,71 @@ impl Check for NetDev {
         let Some((first, last)) = self.window.ends() else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };
-        evaluate_dev(s, first, last, &self.speeds)
+        let mut s = evaluate_dev(s, first, last, &self.speeds);
+        if let Some((a, b)) = self.softnet.ends() {
+            softnet_signals(&mut s, &a.1, &b.1);
+        }
+        if let Some((a, b)) = self.softirqs.ends() {
+            net_rx_spread(&mut s, &a.1, &b.1);
+        }
+        s
+    }
+}
+
+/// Backlog drops and NAPI time squeezes, summed over all CPUs.
+fn softnet_signals(s: &mut Section, a: &[SoftnetRow], b: &[SoftnetRow]) {
+    let sum = |rows: &[SoftnetRow], f: fn(&SoftnetRow) -> u64| {
+        rows.iter().fold(0u64, |acc, r| acc.saturating_add(f(r)))
+    };
+    let delta = |f: fn(&SoftnetRow) -> u64| sum(b, f).saturating_sub(sum(a, f));
+    let dropped = delta(|r| r.dropped);
+    let squeezed = delta(|r| r.time_squeeze);
+    s.metric("softnet_dropped", dropped as f64);
+    s.metric("softnet_squeezed", squeezed as f64);
+    if dropped > 0 {
+        s.warn(format!(
+            "{dropped} packets dropped at the per-CPU backlog: raise net.core.netdev_max_backlog \
+             / check RPS"
+        ));
+    }
+    if squeezed > 0 {
+        s.note(format!(
+            "NAPI budget exhausted {squeezed} times: net.core.netdev_budget"
+        ));
+    }
+}
+
+/// NET_RX softirqs concentrated on one CPU point at IRQ affinity or RSS problems.
+fn net_rx_spread(s: &mut Section, a: &SoftIrqs, b: &SoftIrqs) {
+    let (Some(ra), Some(rb)) = (a.get("NET_RX"), b.get("NET_RX")) else {
+        return;
+    };
+    // CPUs present at both ends of the window, matched by number.
+    let per_cpu: Vec<(usize, u64)> = b
+        .cpus
+        .iter()
+        .zip(rb)
+        .filter_map(|(cpu, end)| {
+            let i = a.cpus.iter().position(|c| c == cpu)?;
+            Some((*cpu, end.saturating_sub(ra[i])))
+        })
+        .collect();
+    let total: u64 = per_cpu.iter().map(|(_, d)| d).sum();
+    if per_cpu.len() < 2 || total <= NET_RX_MIN {
+        return;
+    }
+    // Largest first; ties keep the lower CPU number.
+    let (cpu, max) = per_cpu.iter().fold(
+        (0, 0),
+        |best, &(c, d)| if d > best.1 { (c, d) } else { best },
+    );
+    let share = max as f64 * 100.0 / total as f64;
+    s.metric("net_rx_max_cpu_share_pct", share);
+    if share > NET_RX_SHARE_PCT {
+        s.note(format!(
+            "NET_RX concentrated on cpu{cpu} ({share:.0}% of {total} softirqs): check IRQ \
+             affinity / RSS"
+        ));
     }
 }
 
@@ -363,8 +452,33 @@ fn evaluate_tcp(
         }
     }
 
+    udp_errors(&mut s, a, b);
+
     if let Some(((_, na), (_, nb))) = netstat {
         let d = |f: &str| counter(nb, "TcpExt", f).saturating_sub(counter(na, "TcpExt", f));
+        for (field, metric, what) in [
+            (
+                "TCPBacklogDrop",
+                "tcp_backlog_drops",
+                "segments dropped because the socket backlog was full: the application \
+                 does not read fast enough",
+            ),
+            (
+                "TCPAbortOnMemory",
+                "tcp_abort_on_memory",
+                "connections aborted for lack of socket memory: check net.ipv4.tcp_mem \
+                 and orphaned sockets",
+            ),
+        ] {
+            if nb.get("TcpExt", field).is_none() {
+                continue;
+            }
+            let n = d(field);
+            s.metric(metric, n as f64);
+            if n > 0 {
+                s.warn(format!("{n} {what} ({field})"));
+            }
+        }
         let (overflows, drops) = (d("ListenOverflows"), d("ListenDrops"));
         s.metric("listen_overflows", overflows as f64);
         s.metric("listen_drops", drops as f64);
@@ -380,6 +494,39 @@ fn evaluate_tcp(
         "active {active:.1}/s passive {passive:.1}/s retrans {retrans:.1}/s{ratio} estab {estab}"
     ));
     s
+}
+
+/// UDP buffer and input errors, summed over the `Udp:` and `UdpLite:` sections.
+fn udp_errors(s: &mut Section, a: &Snmp, b: &Snmp) {
+    if !b.has_section("Udp") {
+        return;
+    }
+    for (field, metric, what) in [
+        (
+            "RcvbufErrors",
+            "udp_rcvbuf_errors",
+            "UDP receive buffer overflows: application too slow or rmem too small",
+        ),
+        (
+            "SndbufErrors",
+            "udp_sndbuf_errors",
+            "UDP send buffer errors: sending faster than the buffer drains or wmem too small",
+        ),
+        (
+            "InErrors",
+            "udp_in_errors",
+            "UDP input errors: datagrams dropped on receive (buffer overflows or bad checksums)",
+        ),
+    ] {
+        let n: u64 = ["Udp", "UdpLite"]
+            .iter()
+            .map(|sec| counter(b, sec, field).saturating_sub(counter(a, sec, field)))
+            .sum();
+        s.metric(metric, n as f64);
+        if n > 0 {
+            s.warn(format!("{what} ({field} +{n} during the window)"));
+        }
+    }
 }
 
 #[cfg(test)]
@@ -548,6 +695,135 @@ mod tests {
         assert_eq!(s.metrics["eth0.errors"], 0.0);
     }
 
+    /// Net check over one 1 s window with idle interfaces and the given optional sources.
+    fn run_net_extra(extra: &[(&str, &str, &str)]) -> Section {
+        let rows = [("eth0", 0, 0, 0, 0)];
+        let src = MemSource::new().with(DEV, &dev(&rows));
+        for (path, t0, _) in extra {
+            src.set(path, t0);
+        }
+        let mut c = NetDev::default();
+        c.sample(&src, 0.0);
+        for (path, _, t1) in extra {
+            src.set(path, t1);
+        }
+        c.sample(&src, 1.0);
+        c.evaluate(&ctx())
+    }
+
+    /// softnet_stat rows `(processed, dropped, time_squeeze)` in hex, 13 columns.
+    fn softnet(rows: &[(u64, u64, u64)]) -> String {
+        rows.iter()
+            .enumerate()
+            .map(|(i, (p, d, q))| {
+                format!(
+                    "{p:08x} {d:08x} {q:08x} 00000000 00000000 00000000 00000000 00000000 \
+                     00000000 00000000 00000000 00000000 {i:08x}\n"
+                )
+            })
+            .collect()
+    }
+
+    fn softirqs(net_rx: &[u64]) -> String {
+        let cols: Vec<String> = (0..net_rx.len()).map(|i| format!("CPU{i}")).collect();
+        let vals: Vec<String> = net_rx.iter().map(u64::to_string).collect();
+        format!(
+            "  {}\n  HI: {}\n  NET_RX: {}\n",
+            cols.join(" "),
+            vec!["0"; net_rx.len()].join(" "),
+            vals.join(" ")
+        )
+    }
+
+    #[test]
+    fn softnet_drops_warn() {
+        let s = run_net_extra(&[(
+            SOFTNET,
+            &softnet(&[(100, 0, 0), (100, 3, 0)]),
+            &softnet(&[(200, 0, 0), (200, 4, 0)]),
+        )]);
+        assert_eq!(s.metrics["softnet_dropped"], 1.0);
+        assert_eq!(s.metrics["softnet_squeezed"], 0.0);
+        assert_eq!(s.status, Status::Warn);
+        assert!(
+            s.findings[0]
+                .message
+                .contains("dropped at the per-CPU backlog: raise net.core.netdev_max_backlog"),
+            "{:?}",
+            s.findings
+        );
+        let quiet = softnet(&[(1, 2, 3), (4, 5, 6)]);
+        let s = run_net_extra(&[(SOFTNET, &quiet, &quiet)]);
+        assert_eq!(s.metrics["softnet_dropped"], 0.0);
+        assert_eq!(s.metrics["softnet_squeezed"], 0.0);
+        assert_eq!(s.status, Status::Ok);
+        assert!(s.findings.is_empty());
+    }
+
+    #[test]
+    fn softnet_squeeze_note() {
+        let s = run_net_extra(&[(
+            SOFTNET,
+            &softnet(&[(100, 0, 10)]),
+            &softnet(&[(900, 0, 15)]),
+        )]);
+        assert_eq!(s.metrics["softnet_squeezed"], 5.0);
+        assert_eq!(s.status, Status::Ok);
+        assert_eq!(s.findings[0].level, Level::Note);
+        assert!(
+            s.findings[0].message.contains("net.core.netdev_budget"),
+            "{:?}",
+            s.findings
+        );
+    }
+
+    #[test]
+    fn softnet_missing_is_fine() {
+        let s = run_net_extra(&[]);
+        assert_eq!(s.status, Status::Ok);
+        for k in [
+            "softnet_dropped",
+            "softnet_squeezed",
+            "net_rx_max_cpu_share_pct",
+        ] {
+            assert!(!s.metrics.contains_key(k), "{k}");
+        }
+        let s = run_net_extra(&[(SOFTNET, "garbage\n", "garbage\n")]);
+        assert_eq!(s.status, Status::Ok);
+        assert!(!s.metrics.contains_key("softnet_dropped"));
+    }
+
+    #[test]
+    fn net_rx_concentration() {
+        let rx = |d0: u64, d1: u64| {
+            run_net_extra(&[(
+                SOFTIRQS,
+                &softirqs(&[500, 500]),
+                &softirqs(&[500 + d0, 500 + d1]),
+            )])
+        };
+        let s = rx(1600, 400);
+        assert_eq!(s.metrics["net_rx_max_cpu_share_pct"], 80.0);
+        assert!(s.findings.is_empty(), "{:?}", s.findings);
+        let s = rx(1601, 399);
+        assert_eq!(s.status, Status::Ok);
+        assert!(
+            s.findings.iter().any(
+                |f| f.level == Level::Note && f.message.contains("NET_RX concentrated on cpu0")
+            ),
+            "{:?}",
+            s.findings
+        );
+        // 1000 in total is too few to judge.
+        let s = rx(0, 1000);
+        assert!(!s.metrics.contains_key("net_rx_max_cpu_share_pct"));
+        assert!(s.findings.is_empty());
+        // A single CPU can't be imbalanced.
+        let s = run_net_extra(&[(SOFTIRQS, &softirqs(&[0]), &softirqs(&[5000]))]);
+        assert!(!s.metrics.contains_key("net_rx_max_cpu_share_pct"));
+        assert!(s.findings.is_empty());
+    }
+
     #[test]
     fn missing_net_dev_is_skipped() {
         let mut c = NetDev::default();
@@ -677,6 +953,111 @@ mod tests {
         let s = window(0, 0);
         assert_eq!(s.status, Status::Ok);
         assert!(!s.metrics.contains_key("listen_overflows"));
+    }
+
+    /// Tcp plus Udp and optional UdpLite sections, each `(InErrors, RcvbufErrors, SndbufErrors)`.
+    fn snmp_udp(udp: (u64, u64, u64), lite: Option<(u64, u64, u64)>) -> String {
+        let mut s = snmp((0, 0, 0, 0, 0));
+        let sec = |name: &str, (ie, rb, sb): (u64, u64, u64)| {
+            format!(
+                "{name}: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\n\
+                 {name}: 10 0 {ie} 10 {rb} {sb}\n"
+            )
+        };
+        s += &sec("Udp", udp);
+        if let Some(l) = lite {
+            s += &sec("UdpLite", l);
+        }
+        s
+    }
+
+    fn run_udp(t0: &str, t1: &str) -> Section {
+        let src = MemSource::new().with(SNMP, t0);
+        let mut c = Tcp::default();
+        c.sample(&src, 0.0);
+        src.set(SNMP, t1);
+        c.sample(&src, 1.0);
+        c.evaluate(&ctx())
+    }
+
+    #[test]
+    fn udp_errors_warn() {
+        let s = run_udp(&snmp_udp((5, 5, 0), None), &snmp_udp((5, 9, 0), None));
+        assert_eq!(s.metrics["udp_rcvbuf_errors"], 4.0);
+        assert_eq!(s.metrics["udp_in_errors"], 0.0);
+        assert_eq!(s.status, Status::Warn);
+        assert_eq!(s.findings.len(), 1, "{:?}", s.findings);
+        assert!(
+            s.findings[0].message.contains(
+                "UDP receive buffer overflows: application too slow or rmem too small (RcvbufErrors"
+            ),
+            "{:?}",
+            s.findings
+        );
+        let s = run_udp(&snmp_udp((0, 0, 0), None), &snmp_udp((2, 0, 0), None));
+        assert_eq!(s.metrics["udp_in_errors"], 2.0);
+        assert_eq!(s.status, Status::Warn);
+        assert!(s.findings[0].message.contains("InErrors"));
+        let quiet = snmp_udp((3, 3, 3), Some((1, 1, 1)));
+        let s = run_udp(&quiet, &quiet);
+        assert_eq!(s.status, Status::Ok);
+        for k in ["udp_rcvbuf_errors", "udp_sndbuf_errors", "udp_in_errors"] {
+            assert_eq!(s.metrics[k], 0.0, "{k}");
+        }
+    }
+
+    #[test]
+    fn udplite_counts() {
+        let s = run_udp(
+            &snmp_udp((0, 0, 0), Some((0, 0, 0))),
+            &snmp_udp((0, 0, 0), Some((0, 0, 1))),
+        );
+        assert_eq!(s.metrics["udp_sndbuf_errors"], 1.0);
+        assert_eq!(s.status, Status::Warn);
+        assert!(s.findings[0].message.contains("SndbufErrors +1"));
+    }
+
+    #[test]
+    fn no_udp_section() {
+        let s = window(0, 0);
+        assert_eq!(s.status, Status::Ok);
+        assert!(!s.metrics.contains_key("udp_rcvbuf_errors"));
+    }
+
+    #[test]
+    fn tcp_socket_memory_drops() {
+        let ns = |backlog: u64, abort: u64| {
+            format!(
+                "TcpExt: ListenOverflows ListenDrops TCPBacklogDrop TCPAbortOnMemory\n\
+                 TcpExt: 0 0 {backlog} {abort}\n"
+            )
+        };
+        let run = |t0: &str, t1: &str| {
+            let src = MemSource::new()
+                .with(SNMP, &snmp((0, 0, 0, 0, 0)))
+                .with(NETSTAT, t0);
+            let mut c = Tcp::default();
+            c.sample(&src, 0.0);
+            src.set(NETSTAT, t1);
+            c.sample(&src, 1.0);
+            c.evaluate(&ctx())
+        };
+        let s = run(&ns(10, 0), &ns(17, 0));
+        assert_eq!(s.metrics["tcp_backlog_drops"], 7.0);
+        assert_eq!(s.metrics["tcp_abort_on_memory"], 0.0);
+        assert_eq!(s.status, Status::Warn);
+        assert!(s.findings[0].message.contains("TCPBacklogDrop"));
+        let s = run(&ns(0, 2), &ns(0, 3));
+        assert_eq!(s.metrics["tcp_abort_on_memory"], 1.0);
+        assert_eq!(s.status, Status::Warn);
+        assert!(s.findings[0].message.contains("TCPAbortOnMemory"));
+        let s = run(&ns(4, 4), &ns(4, 4));
+        assert_eq!(s.status, Status::Ok);
+        assert_eq!(s.metrics["tcp_backlog_drops"], 0.0);
+        // Counters absent (the default netstat helper has neither).
+        let s = run_tcp((0, 0, 0, 0, 0), (0, 0, 0, 0, 0), Some(((0, 0), (0, 0))));
+        assert!(!s.metrics.contains_key("tcp_backlog_drops"));
+        assert!(!s.metrics.contains_key("tcp_abort_on_memory"));
     }
 
     #[test]
