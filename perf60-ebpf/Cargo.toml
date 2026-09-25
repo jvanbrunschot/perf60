@@ -1,10 +1,11 @@
 [package]
 name = "perf60-ebpf"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "eBPF programs for perf60 --deep"
 # The kernel only exposes the helpers these programs use to GPL-compatible programs.
 license = "MIT OR GPL-2.0"
+publish = false
 
 [dependencies]
 aya-ebpf = { version = "0.2.1", default-features = false }

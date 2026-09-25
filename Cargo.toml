@@ -1,9 +1,10 @@
 [package]
 name = "perf60"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "Linux performance triage in 60 seconds: Brendan Gregg's checklist in one static binary"
 license = "MIT"
+publish = false
 
 [features]
 # eBPF probes for `--deep` (runqlat, biolatency, execsnoop, tcpretrans). Building needs a pinned

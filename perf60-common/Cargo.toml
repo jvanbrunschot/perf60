@@ -1,9 +1,10 @@
 [package]
 name = "perf60-common"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "Map key/value types shared between perf60 and its eBPF programs"
 license = "MIT"
+publish = false
 
 [features]
 # User space: implement aya::Pod so the types can be read from maps.
