@@ -3,6 +3,7 @@
 
 use crate::check::Check;
 
+pub mod disk;
 pub mod load;
 pub mod processes;
 
@@ -10,5 +11,6 @@ pub fn all() -> Vec<Box<dyn Check>> {
     vec![
         Box::new(load::Load::default()),           // uptime
         Box::new(processes::Processes::default()), // pidstat 1
+        Box::new(disk::Disk::default()),           // iostat -xz 1
     ]
 }
