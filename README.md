@@ -1,5 +1,7 @@
 # perf60
 
+[![CI](https://github.com/jvanbrunschot/perf60/actions/workflows/ci.yml/badge.svg)](https://github.com/jvanbrunschot/perf60/actions/workflows/ci.yml)
+
 Brendan Gregg's [Linux Performance Analysis in 60,000 Milliseconds](https://netflixtechblog.com/linux-performance-analysis-in-60-000-milliseconds-accc10403c55)
 as one static binary.
 
@@ -34,10 +36,16 @@ OVERALL: WARN  (2 warnings)
 
 ## Quick start
 
-Copy the binary for your architecture to the server and run it:
+Download the binary for your architecture from the
+[latest release](https://github.com/jvanbrunschot/perf60/releases/latest), copy it to the server
+and run it:
 
 ```sh
-scp dist/perf60-0.1.0-x86_64-linux-musl server:/tmp/perf60
+v=0.1.0 arch=x86_64   # or aarch64
+base=https://github.com/jvanbrunschot/perf60/releases/download/v$v
+curl -LO $base/perf60-$v-$arch-linux-musl -LO $base/SHA256SUMS
+grep "perf60-$v-$arch-" SHA256SUMS | shasum -a 256 -c -
+scp perf60-$v-$arch-linux-musl server:/tmp/perf60
 ssh server 'sudo /tmp/perf60'
 ```
 
@@ -91,6 +99,18 @@ scripts/build-release.sh       # dist/perf60-<version>-{x86_64,aarch64}-linux-mu
 scripts/verify.sh              # run in alpine, debian-slim and busybox containers
 scripts/verify.sh x86_64-unknown-linux-musl   # the other architecture, under emulation
 ```
+
+## Releasing
+
+Bump `version` in `Cargo.toml` through a PR. Once it is merged, push a matching tag:
+
+```sh
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+The [release workflow](.github/workflows/release.yml) reruns all CI checks, builds both static
+binaries and publishes them with `SHA256SUMS` as a GitHub release. The tag must equal
+`v<Cargo.toml version>`. A tag with a suffix such as `v0.2.0-rc.1` becomes a pre-release.
 
 ## Development
 

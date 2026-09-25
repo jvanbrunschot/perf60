@@ -44,13 +44,32 @@ Project context and rules for artifacts are in `openspec/config.yaml`.
 - Before every commit, run:
   `cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test && openspec validate --all --strict`
 
+### Pull requests and CI (GitHub: `jvanbrunschot/perf60`)
+- `main` is only changed through pull requests. Work on `feat/<change-id>` (or `fix/…`,
+  `chore/…`), push the branch, and open a PR with `gh pr create`.
+- CI (`.github/workflows/ci.yml`) runs on every PR:
+  - fmt, clippy, cargo test and `openspec validate --all --strict`
+  - `scripts/verify.sh` on an x86_64 runner and an arm64 runner
+  All jobs must be green before merging.
+- Squash-merge the PR (`gh pr merge --squash`). The squash commit message is the conventional
+  feature message, so `main` keeps one commit per feature.
+- Don't push or merge without the user's go-ahead.
+
+### Releases
+- Bump `version` in `Cargo.toml` in a PR (e.g. `chore(release): 0.2.0`). After it is merged, tag
+  `main` with a matching tag and push it: `git tag v0.2.0 && git push origin v0.2.0`.
+- `.github/workflows/release.yml` checks that the tag equals `v<Cargo.toml version>` and reruns
+  the full CI. Then it builds both static binaries with `scripts/build-release.sh` and publishes
+  a GitHub release with them and `SHA256SUMS`. A tag with a suffix (`v0.2.0-rc.1`) becomes a
+  pre-release.
+
 ### Worktrees for parallel work
 - Serial foundation work happens on `main`.
 - Independent features (typically one check each) are built in parallel in git worktrees on branch
   `feat/<change-id>`, e.g. `git worktree add ../perf60-wt/<change-id> -b feat/<change-id>`, or an
   Agent with `isolation: "worktree"`.
-- To integrate: rebase the branch onto `main`, squash it to one commit, then `git merge --ff-only`.
-  Remove the worktree afterwards (`git worktree remove`).
+- To integrate: rebase the branch onto `main`, squash it to one commit, push it and open a PR
+  (see above). Remove the worktree after the merge (`git worktree remove`).
 - Keep shared touchpoints minimal. A new check should only need its own files plus one line in
   `src/checks/mod.rs` (the registry) and, if needed, a `pub mod` line in `src/procfs/mod.rs`.
 
@@ -68,6 +87,7 @@ tests/fixtures/      captured /proc and /sys samples
 scripts/verify.sh    builds a static Linux binary and runs it in minimal containers
 scripts/capture-fixture.sh  captures a /proc+/sys fixture tree from a container
 scripts/build-release.sh    static release binaries + checksums into dist/
+.github/workflows/   ci.yml (PRs), release.yml (v* tags)
 ```
 
 ## Building and verifying
