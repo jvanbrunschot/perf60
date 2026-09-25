@@ -173,7 +173,8 @@ perf60-ebpf/         eBPF programs, one per src/bin/<probe>.rs (Dual MIT/GPL-2.0
 
 - Unit tests (macOS or Linux): `cargo test` (without `deep`; the eBPF crate is not a default
   member of the workspace)
-- With the eBPF probes: `scripts/build-deep.sh [triple…]` builds `--features deep` inside a rust
+- With the eBPF probes: `scripts/build-deep.sh [--clippy] [triple…]` builds `--features deep`
+  (and with `--clippy` also lints it, as CI does) inside a rust
   container, so macOS needs no nightly, bpf-linker or LLVM. On Linux with the toolchain (as in
   CI): `cargo build --release --features deep --target <triple>`.
   - The nightly is pinned in `build.rs` (`EBPF_TOOLCHAIN`), and CI reads it from there.

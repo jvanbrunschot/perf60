@@ -100,7 +100,9 @@ impl Check for Execsnoop {
             Some(Err(reason)) => return s.skipped(reason.clone()),
             None => return s.skipped("no samples"),
         };
-        let read = || -> Result<(Vec<(String, u64)>, u64, u64), String> {
+        /// (execs by command, total execs, total forks).
+        type Counts = (Vec<(String, u64)>, u64, u64);
+        let read = || -> Result<Counts, String> {
             let by_comm = probe
                 .hash_map::<perf60_common::CommKey, u64>("EXECS")?
                 .into_iter()
