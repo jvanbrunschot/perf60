@@ -1,0 +1,51 @@
+schema: spec-driven
+
+context: |
+  Project: perf60, a single static Rust binary (musl) that runs the checks from Brendan Gregg's
+  "Linux Performance Analysis in 60,000 Milliseconds" and prints a system spec header plus an
+  OK/WARN/CRIT report. Target: Linux (x86_64, aarch64), including minimal installs with no
+  procps or sysstat.
+  Constraints: never execute external commands; read /proc, /sys, /etc/os-release, /dev/kmsg only.
+  Missing sources or permission errors make a check SKIPPED, never fatal.
+  Dependencies are limited to libc, serde and serde_json.
+  Parsers are pure functions over &str, tested against fixtures; they must compile and test on macOS.
+  Conventions: Rust 2024 edition, conventional commits, one OpenSpec change = one commit on main.
+  Capabilities are flat kebab-case (e.g. core-report, load-check, disk-check).
+
+rules:
+  specs:
+    - Every WARN/CRIT threshold MUST have its own scenario with the concrete numeric boundary
+    - Every check MUST specify its SKIPPED behavior when its source is unavailable
+  tasks:
+    - Each task names the unit test or command that verifies it
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
