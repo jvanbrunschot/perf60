@@ -44,6 +44,31 @@ const PSEUDO_FS: &[&str] = &[
     "squashfs",
 ];
 /// Types that are normally mounted read-write; `ro` on these often means errors=remount-ro.
+/// Network and cluster filesystems: statvfs blocks indefinitely (uninterruptibly, for hard
+/// mounts) when the server is unreachable, so these are never stat'ed. `fuse.*` types are
+/// excluded too (a stuck FUSE daemon hangs statvfs the same way); `fuseblk` (local ntfs-3g) is not.
+const REMOTE_FS: &[&str] = &[
+    "nfs",
+    "nfs4",
+    "cifs",
+    "smb3",
+    "smbfs",
+    "ceph",
+    "glusterfs",
+    "9p",
+    "afs",
+    "lustre",
+    "gpfs",
+    "beegfs",
+    "ocfs2",
+    "gfs2",
+    "davfs",
+];
+
+fn is_remote(fstype: &str) -> bool {
+    REMOTE_FS.contains(&fstype) || fstype.starts_with("fuse.")
+}
+
 const WRITABLE_FS: &[&str] = &["ext2", "ext3", "ext4", "xfs", "btrfs", "f2fs", "vfat"];
 const RO_NOTE: &str = "mounted read-only (possibly remounted after errors, check kernel-log)";
 
@@ -134,6 +159,8 @@ impl Fs {
 pub struct Filesystems {
     /// Filesystems of the last sample in which the mount table and a statvfs call succeeded.
     fs: Option<Vec<Fs>>,
+    /// Mount points of network/FUSE filesystems that were deliberately not stat'ed.
+    remote: Vec<String>,
     error: SampleError,
 }
 
@@ -153,9 +180,11 @@ impl Check for Filesystems {
                 return;
             }
         };
+        let (local, remote) = candidates(table);
+        self.remote = remote;
         let mut found = Vec::new();
         let mut failed = SampleError::default();
-        for m in candidates(table) {
+        for m in local {
             match src.statvfs(&m.mount_point) {
                 Ok(st) if st.blocks > 0 => found.push(Fs { mount: m, st }),
                 Ok(_) => {}
@@ -183,13 +212,23 @@ impl Check for Filesystems {
             Some(fs) if fs.is_empty() => {
                 s.skipped(format!("no filesystem with capacity in {MOUNTS}"))
             }
-            Some(fs) => evaluate_filesystems(s, fs, ctx.sys.container),
+            Some(fs) => {
+                let mut s = evaluate_filesystems(s, fs, ctx.sys.container);
+                if !self.remote.is_empty() {
+                    s.detail(format!(
+                        "not checked (network/FUSE, statvfs can hang): {}",
+                        self.remote.join(", ")
+                    ));
+                }
+                s
+            }
         }
     }
 }
 
-/// Real filesystems: pseudo types dropped, and only the last (visible) mount per mount point.
-fn candidates(table: Vec<Mount>) -> Vec<Mount> {
+/// Real filesystems to stat (pseudo types dropped, only the last visible mount per mount
+/// point), and the mount points of network/FUSE filesystems that must not be stat'ed.
+fn candidates(table: Vec<Mount>) -> (Vec<Mount>, Vec<String>) {
     let mut out: Vec<Mount> = Vec::new();
     for m in table {
         if PSEUDO_FS.contains(&m.fstype.as_str()) {
@@ -198,7 +237,9 @@ fn candidates(table: Vec<Mount>) -> Vec<Mount> {
         out.retain(|o| o.mount_point != m.mount_point);
         out.push(m);
     }
-    out
+    let (remote, local): (Vec<Mount>, Vec<Mount>) =
+        out.into_iter().partition(|m| is_remote(&m.fstype));
+    (local, remote.into_iter().map(|m| m.mount_point).collect())
 }
 
 /// One entry per filesystem: bind mounts of the same (source, type, blocks, files) keep the
@@ -1374,5 +1415,77 @@ mod tests {
         assert_eq!(pct_ceil(1, 0), 0);
         assert_eq!(pct1(80.0), "80");
         assert_eq!(pct1(0.814), "0.8");
+    }
+
+    /// Records every statvfs call, so tests can prove a mount was never stat'ed.
+    struct Spy {
+        inner: MemSource,
+        statvfs_calls: std::cell::RefCell<Vec<String>>,
+    }
+
+    impl Source for Spy {
+        fn read_to_string(&self, path: &str) -> std::io::Result<String> {
+            self.inner.read_to_string(path)
+        }
+        fn read_dir(&self, path: &str) -> std::io::Result<Vec<String>> {
+            self.inner.read_dir(path)
+        }
+        fn exists(&self, path: &str) -> bool {
+            self.inner.exists(path)
+        }
+        fn read_kmsg(&self) -> std::io::Result<Vec<String>> {
+            self.inner.read_kmsg()
+        }
+        fn statvfs(&self, path: &str) -> std::io::Result<crate::source::FsStat> {
+            self.statvfs_calls.borrow_mut().push(path.to_owned());
+            self.inner.statvfs(path)
+        }
+    }
+
+    #[test]
+    fn network_filesystems_are_never_statted() {
+        let inner = MemSource::new().with(
+            MOUNTS,
+            "/dev/sda1 / xfs rw 0 0\n\
+             nas:/export /mnt/share nfs4 rw,hard 0 0\n\
+             user@host: /mnt/remote fuse.sshfs rw 0 0\n",
+        );
+        inner.set_statvfs("/", st(1000, 500, 500, 10, 5));
+        let spy = Spy {
+            inner,
+            statvfs_calls: Default::default(),
+        };
+        let mut c = Filesystems::default();
+        c.sample(&spy, 0.0);
+        assert_eq!(*spy.statvfs_calls.borrow(), vec!["/".to_owned()]);
+        let s = c.evaluate(&ctx());
+        assert_ne!(s.status, Status::Skipped);
+        assert!(
+            s.details
+                .iter()
+                .any(|d| d
+                    == "not checked (network/FUSE, statvfs can hang): /mnt/share, /mnt/remote"),
+            "{:?}",
+            s.details
+        );
+    }
+
+    #[test]
+    fn fuseblk_is_checked() {
+        let src = MemSource::new().with(
+            MOUNTS,
+            "/dev/sda1 / xfs rw 0 0\n/dev/sdb1 /mnt/usb fuseblk rw 0 0\n",
+        );
+        src.set_statvfs("/", st(1000, 500, 500, 10, 5));
+        src.set_statvfs("/mnt/usb", st(1000, 100, 100, 10, 5));
+        let mut c = Filesystems::default();
+        c.sample(&src, 0.0);
+        let s = c.evaluate(&ctx());
+        assert!(
+            s.metrics.contains_key("/mnt/usb.used_pct"),
+            "{:?}",
+            s.metrics
+        );
+        assert!(!s.details.iter().any(|d| d.starts_with("not checked")));
     }
 }
