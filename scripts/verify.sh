@@ -9,20 +9,26 @@ case "$(docker info --format '{{.Architecture}}' 2>/dev/null)" in
   *) default=aarch64-unknown-linux-musl ;;
 esac
 target=${1:-$default}
+case "$target" in
+  x86_64-*) platform=linux/amd64 ;;
+  aarch64-*) platform=linux/arm64 ;;
+  *) echo "unsupported target $target"; exit 3 ;;
+esac
 
 cargo build --release --target "$target"
 bin="target/$target/release/perf60"
-file "$bin" | grep -q "statically linked" || { echo "FAIL: $bin is not statically linked"; exit 1; }
+file "$bin" | grep -Eq "static(-pie)? linked|statically linked" || { echo "FAIL: $bin is not statically linked"; exit 1; }
 
 fail=0
-# run <image> <expect-skip-kernel-log:yes|no> <docker args...> -- <perf60 args...>
+# run <image> <docker args...> -- <perf60 args...>
 run() {
   image=$1; shift
   dargs=""
   while [ "$1" != "--" ]; do dargs="$dargs $1"; shift; done
   shift
   # shellcheck disable=SC2086
-  cid=$(docker create $dargs "$image" /perf60 "$@")
+  docker pull -q --platform "$platform" "$image" >/dev/null
+  cid=$(docker create --platform "$platform" $dargs "$image" /perf60 "$@")
   docker cp "$bin" "$cid:/perf60" >/dev/null
   set +e
   out=$(docker start -a "$cid" 2>&1)

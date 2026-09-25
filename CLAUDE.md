@@ -67,6 +67,7 @@ src/report/          text and JSON renderers
 tests/fixtures/      captured /proc and /sys samples
 scripts/verify.sh    builds a static Linux binary and runs it in minimal containers
 scripts/capture-fixture.sh  captures a /proc+/sys fixture tree from a container
+scripts/build-release.sh    static release binaries + checksums into dist/
 ```
 
 ## Building and verifying
@@ -75,4 +76,6 @@ scripts/capture-fixture.sh  captures a /proc+/sys fixture tree from a container
 - Static Linux binary: `cargo build --release --target aarch64-unknown-linux-musl`
   (or `x86_64-unknown-linux-musl`). This links with Rust's bundled `rust-lld` via
   `.cargo/config.toml`, so no cross toolchain is needed, even on macOS.
-- End-to-end in minimal containers (alpine, debian-slim, busybox): `scripts/verify.sh`
+- Release binaries for both architectures plus `SHA256SUMS`: `scripts/build-release.sh` (output in `dist/`)
+- End-to-end in minimal containers (alpine, debian-slim, busybox): `scripts/verify.sh [target]`.
+  `x86_64-unknown-linux-musl` runs under amd64 emulation on arm64 hosts.
