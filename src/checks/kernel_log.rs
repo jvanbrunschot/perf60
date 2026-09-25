@@ -130,8 +130,14 @@ impl Check for KernelLog {
             }
             Err(e) => {
                 let mut reason = describe_error(KMSG, &e);
-                if e.kind() == std::io::ErrorKind::PermissionDenied {
-                    reason.push_str(" (run as root or set kernel.dmesg_restrict=0)");
+                match e.kind() {
+                    std::io::ErrorKind::PermissionDenied => {
+                        reason.push_str(" (run as root or set kernel.dmesg_restrict=0)")
+                    }
+                    std::io::ErrorKind::NotFound => {
+                        reason.push_str(" (run on the host, or use --privileged in a container)")
+                    }
+                    _ => {}
                 }
                 self.error = Some(reason);
             }
@@ -524,10 +530,13 @@ mod tests {
     }
 
     #[test]
-    fn missing_kmsg_is_skipped() {
+    fn missing_kmsg_has_hint() {
         let s = check(&MemSource::new().with(UPTIME, "10.0 1.0"));
         assert_eq!(s.status, Status::Skipped);
-        assert!(s.summary.contains("/dev/kmsg"), "{}", s.summary);
+        assert_eq!(
+            s.summary,
+            "/dev/kmsg not available (run on the host, or use --privileged in a container)"
+        );
     }
 
     #[test]

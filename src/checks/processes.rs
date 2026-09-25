@@ -47,6 +47,8 @@ pub struct Processes {
     error: SampleError,
     own_pid: u32,
     hz: f64,
+    /// Pids other than our own listed by the last scan (readable or not).
+    others_listed: usize,
 }
 
 impl Default for Processes {
@@ -57,6 +59,7 @@ impl Default for Processes {
             error: SampleError::default(),
             own_pid: std::process::id(),
             hz: clock_ticks_per_sec(),
+            others_listed: 0,
         }
     }
 }
@@ -75,6 +78,7 @@ impl Check for Processes {
             }
         };
         self.scans += 1;
+        self.others_listed = 0;
         let scan = self.scans;
         for name in names {
             let Ok(pid) = name.parse::<u32>() else {
@@ -83,6 +87,7 @@ impl Check for Processes {
             if pid == self.own_pid {
                 continue;
             }
+            self.others_listed += 1;
             // Processes exit between readdir and read all the time: ignore those errors.
             let Ok(text) = src.read_to_string(&format!("{PROC}/{pid}/stat")) else {
                 continue;
@@ -128,6 +133,13 @@ impl Check for Processes {
             .map(|(pid, p)| (*pid, p))
             .collect();
         if current.is_empty() {
+            if self.others_listed == 0 {
+                // e.g. perf60 is PID 1 of a container.
+                let mut s = s;
+                s.summary("no other processes visible");
+                s.metric("processes", 0.0);
+                return s;
+            }
             return s.skipped("no process readable in /proc");
         }
         let mut usage: Vec<Usage> = self
@@ -502,10 +514,28 @@ mod tests {
 
     #[test]
     fn no_readable_process_is_skipped() {
-        let src = MemSource::new().with("/proc/stat", "cpu 0");
+        // Listed but unreadable, e.g. /proc mounted with hidepid.
+        let src = MemSource::new()
+            .with("/proc/stat", "cpu 0")
+            .with("/proc/42/status", "x");
         let mut c = check();
         c.sample(&src, 0.0);
         c.sample(&src, 1.0);
         assert_eq!(c.evaluate(&ctx(4)).status, Status::Skipped);
+    }
+
+    #[test]
+    fn perf60_alone_is_ok() {
+        let mut c = check();
+        let own = c.own_pid;
+        let src = MemSource::new().with("/proc/stat", "cpu 0").with(
+            &format!("/proc/{own}/stat"),
+            &stat(own, "perf60", 'R', 1, 1),
+        );
+        c.sample(&src, 0.0);
+        c.sample(&src, 1.0);
+        let s = c.evaluate(&ctx(4));
+        assert_eq!(s.status, Status::Ok);
+        assert_eq!(s.summary, "no other processes visible");
     }
 }

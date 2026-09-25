@@ -11,6 +11,7 @@ Options:
   -c, --count <N>           Number of sampling intervals [default: 5]
   -j, --json                Print a JSON report
       --no-color            Disable ANSI colors (also honors NO_COLOR)
+  -v, --verbose             Show detail lines for every section, not only problems
   -h, --help                Print help
   -V, --version             Print version
 
@@ -22,6 +23,7 @@ pub struct Options {
     pub count: usize,
     pub json: bool,
     pub color: bool,
+    pub verbose: bool,
 }
 
 impl Default for Options {
@@ -31,6 +33,7 @@ impl Default for Options {
             count: 5,
             json: false,
             color: true,
+            verbose: false,
         }
     }
 }
@@ -61,6 +64,7 @@ pub fn parse<I: IntoIterator<Item = String>>(args: I) -> Result<Command, String>
             "-V" | "--version" => return Ok(Command::Version),
             "-j" | "--json" => opts.json = true,
             "--no-color" => opts.color = false,
+            "-v" | "--verbose" => opts.verbose = true,
             "-i" | "--interval" => {
                 let v = value("--interval")?;
                 opts.interval = v

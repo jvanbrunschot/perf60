@@ -19,7 +19,7 @@ fn every_registered_check_renders_against_fixture() {
         assert!(!s.summary.is_empty(), "{} has empty summary", s.id);
         assert_ne!(s.status, Status::Skipped, "{} skipped: {}", s.id, s.summary);
     }
-    let text = perf60::report::text::render(&r, false);
+    let text = perf60::report::text::render(&r, false, true);
     assert!(text.starts_with("perf60 "));
     let json: serde_json::Value = serde_json::from_str(&perf60::report::json::render(&r)).unwrap();
     assert_eq!(json["sections"].as_array().unwrap().len(), ids.len());

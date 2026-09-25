@@ -122,13 +122,13 @@ impl Check for Cpu {
     fn evaluate(&self, ctx: &Context) -> Section {
         let s = Section::new("cpu", "CPU utilization", "vmstat 1");
         match self.samples.window() {
-            Ok(w) => evaluate_cpu(s, w, ctx.cpus()),
+            Ok(w) => evaluate_cpu(s, w, ctx.cpus(), ctx.sys.cpus_online.max(1) as f64),
             Err(reason) => s.skipped(reason),
         }
     }
 }
 
-fn evaluate_cpu(mut s: Section, w: &[(f64, Stat)], cpus: f64) -> Section {
+fn evaluate_cpu(mut s: Section, w: &[(f64, Stat)], cpus: f64, online: f64) -> Section {
     let (first, last) = (&w[0], &w[w.len() - 1]);
     let p = Split::of(&last.1.total.since(&first.1.total));
     let n = w.len() as f64;
@@ -178,15 +178,20 @@ fn evaluate_cpu(mut s: Section, w: &[(f64, Stat)], cpus: f64) -> Section {
         s.metric(k, v);
     }
 
-    s.threshold(
-        r,
-        cpus,
-        2.0 * cpus,
-        format!(
-            "run queue r={r:.1} exceeds {} cpus: CPU saturation, runnable tasks wait for a CPU",
-            units::cpus(cpus)
-        ),
-    );
+    // procs_running is an instantaneous count: a long queue on mostly idle CPUs is sampling
+    // noise, not saturation. Judge it only when at least half the capacity is in use.
+    let in_use = (p.us + p.sy + p.st) / 100.0 * online;
+    if in_use >= 0.5 * cpus {
+        s.threshold(
+            r,
+            cpus,
+            2.0 * cpus,
+            format!(
+                "run queue r={r:.1} exceeds {} cpus: CPU saturation, runnable tasks wait for a CPU",
+                units::cpus(cpus)
+            ),
+        );
+    }
     s.threshold(
         p.wa,
         20.0,
@@ -525,9 +530,9 @@ mod tests {
 
     #[test]
     fn cpu_run_queue_thresholds() {
-        let at = |running: u64| {
+        let at = |running: u64, busy: u64| {
             let a = base(4);
-            let d = vec![user(10); 4];
+            let d = vec![user(busy); 4];
             cpu(
                 &[
                     stat_text(&a, 0, 0, running, 0),
@@ -536,11 +541,51 @@ mod tests {
                 4,
             )
         };
-        assert_eq!(at(5).status, Status::Ok); // r = 4.0
-        let s = at(6); // r = 5.0
-        assert_eq!(s.status, Status::Warn);
-        assert!(has(&s, Level::Warn, "CPU saturation"), "{:?}", s.findings);
-        assert_eq!(at(10).status, Status::Crit); // r = 9.0
+        let saturated = |s: &Section, level: Level| has(s, level, "CPU saturation");
+        let s = at(5, 95); // r = 4.0
+        assert!(!saturated(&s, Level::Warn) && !saturated(&s, Level::Crit));
+        let s = at(6, 95); // r = 5.0
+        assert!(saturated(&s, Level::Warn), "{:?}", s.findings);
+        let s = at(10, 95); // r = 9.0
+        assert!(saturated(&s, Level::Crit));
+        assert_eq!(s.status, Status::Crit);
+    }
+
+    #[test]
+    fn run_queue_on_idle_cpus() {
+        let a = base(4);
+        let d = vec![user(19); 4];
+        let s = cpu(
+            &[
+                stat_text(&a, 0, 0, 6, 0),
+                stat_text(&plus(&a, &d), 0, 0, 6, 0),
+            ],
+            4,
+        );
+        assert_eq!(s.metrics["r"], 5.0);
+        assert!(!has(&s, Level::Warn, "CPU saturation"), "{:?}", s.findings);
+        assert_eq!(s.status, Status::Ok);
+    }
+
+    #[test]
+    fn run_queue_under_cgroup_quota() {
+        let a = base(4);
+        let d = vec![user(25); 4]; // 1 of 4 CPUs in use = 67% of a 1.5 CPU quota
+        let texts = [
+            stat_text(&a, 0, 0, 5, 0),
+            stat_text(&plus(&a, &d), 0, 0, 5, 0),
+        ]; // r = 4.0 > 2 × 1.5
+        let ctx = Context {
+            sys: SysInfo {
+                cpus_online: 4,
+                cgroup_cpu_limit: Some(1.5),
+                ..Default::default()
+            },
+            interval: 1.0,
+            count: 1,
+        };
+        let s = feed(Cpu::default(), &texts).evaluate(&ctx);
+        assert_eq!(s.status, Status::Crit, "{:?}", s.findings);
     }
 
     #[test]

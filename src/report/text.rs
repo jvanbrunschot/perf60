@@ -31,7 +31,8 @@ impl Paint {
     }
 }
 
-pub fn render(r: &Report, color: bool) -> String {
+/// Render the text report. Detail lines are shown for non-OK sections, or all when `verbose`.
+pub fn render(r: &Report, color: bool, verbose: bool) -> String {
     let p = Paint(color);
     let mut out = String::new();
     let sys = &r.system;
@@ -146,12 +147,16 @@ pub fn render(r: &Report, color: bool) -> String {
         p.status(r.overall)
     );
 
+    let width = r.sections.iter().map(|s| s.id.len()).max().unwrap_or(0) + 1;
+    let indent = 7 + width;
     for s in &r.sections {
         let tag = format!("[{:^4}]", s.status.label());
         let tag = tag.replace(s.status.label(), &p.status(s.status));
-        let _ = writeln!(out, "{tag} {:<10} {}", s.id, s.summary);
-        for d in &s.details {
-            let _ = writeln!(out, "{:18}{d}", "");
+        let _ = writeln!(out, "{tag} {:<width$}{}", s.id, s.summary);
+        if verbose || !matches!(s.status, Status::Ok) {
+            for d in &s.details {
+                let _ = writeln!(out, "{:indent$}{d}", "");
+            }
         }
         for f in &s.findings {
             let mark = match f.level {
@@ -159,7 +164,7 @@ pub fn render(r: &Report, color: bool) -> String {
                 Level::Warn => p.wrap("33;1", "!"),
                 Level::Crit => p.wrap("31;1", "!!"),
             };
-            let _ = writeln!(out, "{:18}{mark} {}", "", f.message);
+            let _ = writeln!(out, "{:indent$}{mark} {}", "", f.message);
         }
     }
     out
@@ -205,7 +210,7 @@ mod tests {
 
     #[test]
     fn plain_text_layout() {
-        let t = render(&report(), false);
+        let t = render(&report(), false, false);
         let first = t.lines().next().unwrap();
         assert!(
             first.contains("host01 · Linux 6.8.0 · Ubuntu 24.04 · x86_64 · 8 cpus · 16 GiB RAM"),
@@ -215,13 +220,72 @@ mod tests {
         assert!(t.contains("cgroup cpu 1.5"));
         assert!(t.contains("OVERALL: WARN  (1 warning)"));
         assert!(t.contains("[ OK ] load"));
-        assert!(t.contains("[WARN] disk       vda util 93%"));
+        assert!(t.contains("[WARN] disk vda util 93%"), "{t}");
         assert!(t.contains("! vda saturated"));
         assert!(!t.contains('\x1b'));
     }
 
+    fn section(id: &'static str, warn: bool) -> Section {
+        let mut s = Section::new(id, "T", "t");
+        s.summary("sum");
+        s.detail("detail line");
+        s.note("a note");
+        if warn {
+            s.warn("problem");
+        }
+        s
+    }
+
+    fn render_sections(sections: Vec<Section>, verbose: bool) -> String {
+        let r = Report::new(
+            SysInfo::default(),
+            Sampling {
+                interval: 1.0,
+                count: 1,
+            },
+            sections,
+        );
+        render(&r, false, verbose)
+    }
+
+    #[test]
+    fn ok_details_hidden() {
+        let t = render_sections(vec![section("load", false)], false);
+        assert!(!t.contains("detail line"), "{t}");
+        assert!(t.contains("· a note"));
+    }
+
+    #[test]
+    fn problem_details_shown() {
+        let t = render_sections(vec![section("disk", true)], false);
+        assert!(t.contains("detail line"));
+        assert!(t.contains("! problem"));
+    }
+
+    #[test]
+    fn verbose_shows_all() {
+        let t = render_sections(vec![section("load", false)], true);
+        assert!(t.contains("detail line"));
+    }
+
+    #[test]
+    fn long_ids_aligned() {
+        let t = render_sections(
+            vec![section("load", false), section("cpu-balance", false)],
+            false,
+        );
+        let cols: Vec<usize> = t
+            .lines()
+            .filter(|l| l.starts_with('['))
+            .map(|l| l.find("sum").unwrap())
+            .collect();
+        assert_eq!(cols.len(), 2);
+        assert_eq!(cols[0], cols[1]);
+        assert!(t.contains("cpu-balance sum"));
+    }
+
     #[test]
     fn color_uses_ansi() {
-        assert!(render(&report(), true).contains("\x1b[33;1mWARN\x1b[0m"));
+        assert!(render(&report(), true, false).contains("\x1b[33;1mWARN\x1b[0m"));
     }
 }

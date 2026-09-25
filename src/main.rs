@@ -32,7 +32,7 @@ fn main() -> ExitCode {
         report::json::render(&r)
     } else {
         let color = opts.color && std::env::var_os("NO_COLOR").is_none() && stdout_is_tty();
-        report::text::render(&r, color)
+        report::text::render(&r, color, opts.verbose)
     };
     // Ignore EPIPE (e.g. `perf60 | head`): the exit code still reflects the system state.
     let _ = std::io::stdout().lock().write_all(out.as_bytes());
