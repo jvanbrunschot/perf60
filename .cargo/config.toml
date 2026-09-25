@@ -1,0 +1,7 @@
+# Static Linux builds from any host: the musl targets ship their own libc and CRT objects,
+# so Rust's bundled lld is the only linker needed (no cross toolchain or container).
+[target.aarch64-unknown-linux-musl]
+linker = "rust-lld"
+
+[target.x86_64-unknown-linux-musl]
+linker = "rust-lld"

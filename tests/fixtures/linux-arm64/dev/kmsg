@@ -1,0 +1,1174 @@
+6,0,0,-;Booting Linux on physical CPU 0x0000000000 [0x610f0000]
+5,1,0,-;Linux version 7.1.10-200.fc44.aarch64 (mockbuild@8cb6cb938d234501b2331f3bc108c6fd) (gcc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2), GNU ld version 2.46.1-1.fc44) #1 SMP PREEMPT_DYNAMIC Sun Aug 23 16:21:29 UTC 2026
+6,2,0,-;KASLR enabled
+6,3,0,-;Machine model: linux,dummy-virt
+6,4,0,-;efi: EFI v2.7 by EDK II
+6,5,0,-;efi: SMBIOS 3.0=0xbfee0000 MEMATTR=0xbee0a298 MOKvar=0xbc6e0000 INITRD=0xbcb42418 RNG=0xb1ff0018 MEMRESERVE=0xbcb40e98 
+5,6,0,-;random: crng init done
+6,7,0,-;secureboot: Secure boot disabled
+6,8,0,-;OF: reserved mem: Reserved memory: No reserved-memory node in the DT
+6,9,0,-;NUMA: Faking a node at [mem 0x0000000040000000-0x00000000bfffffff]
+6,10,0,-;NODE_DATA(0) allocated [mem 0xbf845a00-0xbf85c7ff]
+6,11,0,-;cma: Reserved 64 MiB at 0x00000000b8600000
+6,12,0,-;psci: probing for conduit method from DT.
+6,13,0,-;psci: PSCIv0.2 detected in firmware.
+6,14,0,-;psci: Using standard PSCI v0.2 function IDs
+6,15,0,-;psci: Trusted OS migration not required
+6,16,0,-;Zone ranges:
+6,17,0,-;  DMA      [mem 0x0000000040000000-0x00000000bfffffff]
+6,18,0,-;  DMA32    empty
+6,19,0,-;  Normal   empty
+6,20,0,-;  Device   empty
+6,21,0,-;Movable zone start for each node
+6,22,0,-;Early memory node ranges
+6,23,0,-;  node   0: [mem 0x0000000040000000-0x00000000bc6dffff]
+6,24,0,-;  node   0: [mem 0x00000000bc6e0000-0x00000000bc6effff]
+6,25,0,-;  node   0: [mem 0x00000000bc6f0000-0x00000000bc92ffff]
+6,26,0,-;  node   0: [mem 0x00000000bc930000-0x00000000bcb3ffff]
+6,27,0,-;  node   0: [mem 0x00000000bcb40000-0x00000000bfe1ffff]
+6,28,0,-;  node   0: [mem 0x00000000bfe20000-0x00000000bfeaffff]
+6,29,0,-;  node   0: [mem 0x00000000bfeb0000-0x00000000bfebffff]
+6,30,0,-;  node   0: [mem 0x00000000bfec0000-0x00000000bffdffff]
+6,31,0,-;  node   0: [mem 0x00000000bffe0000-0x00000000bfffffff]
+6,32,0,-;Initmem setup node 0 [mem 0x0000000040000000-0x00000000bfffffff]
+6,33,0,-;percpu: Embedded 58 pages/cpu s112408 r8192 d116968 u237568
+7,34,0,-;pcpu-alloc: s112408 r8192 d116968 u237568 alloc=58*4096
+7,35,0,-;pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+6,36,0,-;Detected PIPT I-cache on CPU0
+6,37,0,-;CPU features: detected: Address authentication (IMP DEF algorithm)
+6,38,0,-;CPU features: detected: GICv3 CPU interface
+6,39,0,-;CPU features: detected: Spectre-v4
+6,40,0,-;CPU features: detected: Spectre-BHB
+6,41,0,-;alternatives: applying boot alternatives
+5,42,0,-;Kernel command line: BOOT_IMAGE=(hd0,gpt3)/boot/ostree/fedora-coreos-f9c212adcc99e108efc95068a6183e300bbf836ddbbc7059420772b3f21f04f7/vmlinuz-7.1.10-200.fc44.aarch64 rw ignition.firstboot ostree.prepare-root.composefs=0 ostree=/ostree/boot.1/fedora-coreos/f9c212adcc99e108efc95068a6183e300bbf836ddbbc7059420772b3f21f04f7/0 ignition.platform.id=applehv console=tty0 console=hvc0
+5,43,0,-;Unknown kernel command line parameters "ostree=/ostree/boot.1/fedora-coreos/f9c212adcc99e108efc95068a6183e300bbf836ddbbc7059420772b3f21f04f7/0", will be passed to user space.
+6,44,0,-;printk: log buffer data + meta data: 262144 + 1114112 = 1376256 bytes
+6,45,0,-;Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+6,46,0,-;Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+6,47,0,-;software IO TLB: SWIOTLB bounce buffer size adjusted to 2MB
+6,48,0,-;software IO TLB: area num 4.
+6,49,0,-;software IO TLB: mapped [mem 0x00000000bf235000-0x00000000bf435000] (2MB)
+6,50,0,-;Fallback order for Node 0: 0 
+6,51,0,-;Built 1 zonelists, mobility grouping on.  Total pages: 524288
+6,52,0,-;Policy zone: DMA
+6,53,0,-;mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+6,54,0,-;SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+6,55,0,-;ftrace: allocating 70189 entries in 276 pages
+6,56,0,-;ftrace: allocated 276 pages with 3 groups
+6,57,0,-;Dynamic Preempt: lazy
+6,58,0,-;rcu: Preemptible hierarchical RCU implementation.
+6,59,0,-;rcu: \x09RCU event tracing is enabled.
+6,60,0,-;rcu: \x09RCU restricting CPUs from NR_CPUS=4096 to nr_cpu_ids=4.
+6,61,0,-;\x09Trampoline variant of Tasks RCU enabled.
+6,62,0,-;\x09Rude variant of Tasks RCU enabled.
+6,63,0,-;\x09Tracing variant of Tasks RCU enabled.
+6,64,0,-;rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+6,65,0,-;rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+6,66,0,-;RCU Tasks: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+6,67,0,-;RCU Tasks Rude: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+6,68,0,-;NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+6,69,0,-;GICv3: 988 SPIs implemented
+6,70,0,-;GICv3: 0 Extended SPIs implemented
+6,71,0,-;Root IRQ handler: gic_handle_irq
+6,72,0,-;GICv3: GICv3 features: 16 PPIs, RSS
+6,73,0,-;GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+6,74,0,-;GICv3: CPU0: found redistributor 0 region 0:0x0000000009f80000
+6,75,0,-;rcu: srcu_init: Setting srcu_struct sizes based on contention.
+6,76,0,-;clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+6,77,0,-;arch_timer: cp15 timer running at 24.00MHz (virt).
+6,78,0,-;clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+6,79,0,-;sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+6,80,389,-;kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+6,81,450,-;Console: colour dummy device 80x25
+6,82,453,-;printk: legacy console [tty0] enabled
+6,83,534,-;Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=24000)
+6,84,537,-;pid_max: default: 32768 minimum: 301
+6,85,675,-;Yama: becoming mindful.
+6,86,693,-;SELinux:  Initializing.
+6,87,2631,-;LSM support for eBPF active
+6,88,2835,-;landlock: Up and running.
+6,89,3230,-;Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+6,90,3241,-;Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+6,91,3375,-;VFS: Finished mounting rootfs on nullfs
+4,92,3682,-;cacheinfo: Unable to detect cache hierarchy for CPU 0
+6,93,3917,-;rcu: Hierarchical SRCU implementation.
+6,94,3918,-;rcu: \x09Max phase no-delay instances is 400.
+6,95,3957,-;Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+6,96,4172,-;Remapping and enabling EFI services.
+6,97,4263,-;smp: Bringing up secondary CPUs ...
+6,98,4477,-;Detected PIPT I-cache on CPU1
+6,99,4493,-;GICv3: CPU1: found redistributor 1 region 0:0x0000000009fa0000
+6,100,4539,-;CPU1: Booted secondary processor 0x0000000001 [0x610f0000]
+6,101,4798,-;Detected PIPT I-cache on CPU2
+6,102,4816,-;GICv3: CPU2: found redistributor 2 region 0:0x0000000009fc0000
+6,103,4862,-;CPU2: Booted secondary processor 0x0000000002 [0x610f0000]
+6,104,5120,-;Detected PIPT I-cache on CPU3
+6,105,5141,-;GICv3: CPU3: found redistributor 3 region 0:0x0000000009fe0000
+6,106,5188,-;CPU3: Booted secondary processor 0x0000000003 [0x610f0000]
+6,107,5248,-;smp: Brought up 1 node, 4 CPUs
+6,108,5255,-;SMP: Total of 4 processors activated.
+6,109,5256,-;CPU: All CPU(s) started at EL1
+6,110,5262,-;CPU features: detected: ARMv8.4 Translation Table Level
+6,111,5263,-;CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+6,112,5265,-;CPU features: detected: Common not Private translations
+6,113,5266,-;CPU features: detected: CRC32 instructions
+6,114,5266,-;CPU features: detected: Data cache clean to Point of Deep Persistence
+6,115,5268,-;CPU features: detected: Data cache clean to Point of Persistence
+6,116,5269,-;CPU features: detected: Data independent timing control (DIT)
+6,117,5269,-;CPU features: detected: E0PD
+6,118,5271,-;CPU features: detected: Generic authentication (IMP DEF algorithm)
+6,119,5272,-;CPU features: detected: RCpc load-acquire (LDAPR)
+6,120,5273,-;CPU features: detected: LSE atomic instructions
+6,121,5274,-;CPU features: detected: Privileged Access Never
+6,122,5275,-;CPU features: detected: RAS Extension Support
+6,123,5276,-;CPU features: detected: Speculation barrier (SB)
+6,124,5277,-;CPU features: detected: TLB range maintenance instructions
+6,125,5277,-;CPU features: detected: XNX
+6,126,5447,-;alternatives: applying system-wide alternatives
+6,127,6150,-;Memory: 1808388K/2097152K available (23872K kernel code, 6330K rwdata, 20484K rodata, 15040K init, 10354K bss, 215572K reserved, 65536K cma-reserved)
+6,128,6513,-;devtmpfs: initialized
+6,129,6915,-;setend instruction emulation is not supported on this system
+6,130,7088,-;posixtimers hash table entries: 2048 (order: 3, 32768 bytes, linear)
+6,131,7105,-;futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+6,132,7215,-;2G module region forced by RANDOMIZE_MODULE_REGION_FULL
+6,133,7216,-;0 pages in range for non-PLT usage
+6,134,7217,-;505184 pages in range for PLT usage
+6,135,7463,-;DMI: SMBIOS 3.0.0 present.
+6,136,7466,-;DMI: Libkrun libkrun Virtual Machine, BIOS 0 01/05/2024
+6,137,7468,-;DMI: Memory slots populated: 0/0
+6,138,8402,-;NET: Registered PF_NETLINK/PF_ROUTE protocol family
+6,139,8730,-;DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+6,140,8739,-;audit: initializing netlink subsys (disabled)
+5,141,8831,-;audit: type=2000 audit(0.008:1): state=initialized audit_enabled=0 res=1
+6,142,8929,-;thermal_sys: Registered thermal governor 'fair_share'
+6,143,8930,-;thermal_sys: Registered thermal governor 'step_wise'
+6,144,8931,-;thermal_sys: Registered thermal governor 'user_space'
+6,145,8960,-;cpuidle: using governor menu
+6,146,9020,-;hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+6,147,9110,-;ASID allocator initialised with 256 entries
+6,148,9207,-;Serial: AMBA PL011 UART driver
+6,149,9820,-;HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+6,150,9821,-;HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+6,151,9823,-;HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+6,152,9824,-;HugeTLB: 0 KiB vmemmap can be freed for a 32.0 MiB page
+6,153,9825,-;HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+6,154,9826,-;HugeTLB: 0 KiB vmemmap can be freed for a 2.00 MiB page
+6,155,9827,-;HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+6,156,9827,-;HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+6,157,11280,-;raid6: skipped pq benchmark and selected neonx8
+6,158,11282,-;raid6: using neon recovery algorithm
+6,159,11333,-;fbcon: Taking over console
+6,160,11336,-;ACPI: Interpreter disabled.
+6,161,11520,-;iommu: Default domain type: Translated
+6,162,11525,-;iommu: DMA domain TLB invalidation policy: lazy mode
+5,163,13517,-;SCSI subsystem initialized
+7,164,13615,-;libata version 3.00 loaded.
+6,165,13645,-;usbcore: registered new interface driver usbfs
+6,166,13650,-;usbcore: registered new interface driver hub
+6,167,13656,-;usbcore: registered new device driver usb
+6,168,13673,-;pps_core: LinuxPPS API ver. 1 registered
+6,169,13674,-;pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+6,170,13676,-;PTP clock support registered
+6,171,13745,-;EDAC MC: Ver: 3.0.0
+6,172,13824,-;scmi_core: SCMI protocol bus registered
+6,173,13935,-;efivars: Registered efivars operations
+6,174,14192,-;NetLabel: Initializing
+6,175,14194,-;NetLabel:  domain hash size = 128
+6,176,14195,-;NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+6,177,14206,-;NetLabel:  unlabeled traffic allowed by default
+6,178,14208,-;mctp: management component transport protocol core
+6,179,14209,-;NET: Registered PF_MCTP protocol family
+6,180,14343,-;vgaarb: loaded
+6,181,14552,-;clocksource: Switched to clocksource arch_sys_counter
+5,182,14729,-;VFS: Disk quotas dquot_6.6.0
+6,183,14735,-;VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+6,184,15004,-;pnp: PnP ACPI: disabled
+6,185,18144,-;NET: Registered PF_INET protocol family
+6,186,18184,-;IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+6,187,27673,-;tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+6,188,27682,-;Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+6,189,27697,-;TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+6,190,27716,-;TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+6,191,27733,-;TCP: Hash tables configured (established 16384 bind 16384)
+6,192,27773,-;MPTCP token hash table entries: 2048 (order: 4, 49152 bytes, linear)
+6,193,27788,-;UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+6,194,27819,-;NET: Registered PF_UNIX/PF_LOCAL protocol family
+6,195,27825,-;NET: Registered PF_XDP protocol family
+6,196,27830,-;PCI: CLS 0 bytes, default 64
+6,197,27897,-;Trying to unpack rootfs image as initramfs...
+6,198,31608,-;kvm [1]: HYP mode not available
+5,199,31908,-;Initialise system trusted keyrings
+5,200,31921,-;Key type blacklist registered
+6,201,31996,-;workingset: timestamp_bits=37 (anon: 33) max_order=19 bucket_order=0 (anon: 0)
+5,202,32580,-;integrity: Platform Keyring initialized
+5,203,32584,-;integrity: Machine keyring initialized
+6,204,32659,-;cryptd: max_cpu_qlen set to 1000
+6,205,37038,-;NET: Registered PF_ALG protocol family
+5,206,37046,-;Key type asymmetric registered
+5,207,37047,-;Asymmetric key parser 'x509' registered
+6,208,37264,-;Block layer SCSI generic (bsg) driver version 0.4 loaded (major 241)
+6,209,37337,-;io scheduler mq-deadline registered
+6,210,37339,-;io scheduler kyber registered
+6,211,37346,-;io scheduler bfq registered
+6,212,37391,-;xor: measuring software checksum speed
+6,213,37455,-;   eor3            : 52564 MB/sec
+6,214,37525,-;   32regs          : 47722 MB/sec
+6,215,37656,-;   8regs           : 25286 MB/sec
+6,216,37657,-;xor: using function: eor3 (52564 MB/sec)
+6,217,38620,-;atomic64_test: passed
+6,218,39035,-;pl061_gpio a003000.pl061: PL061 GPIO chip registered
+ SUBSYSTEM=amba
+ DEVICE=+amba:a003000.pl061
+6,219,39599,-;ledtrig-cpu: registered to indicate activity on CPUs
+6,220,40196,-;Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+6,221,42157,-;msm_serial: driver initialized
+6,222,42188,-;SuperH (H)SCI(F) driver initialized
+6,223,42893,-;CAN device driver interface
+6,224,43000,-;usbcore: registered new interface driver usbserial_generic
+6,225,43004,-;usbserial: USB Serial support registered for generic
+6,226,43045,-;mousedev: PS/2 mouse device common for all mice
+6,227,43218,-;rtc-efi rtc-efi.0: registered as rtc0
+ SUBSYSTEM=platform
+ DEVICE=+platform:rtc-efi.0
+6,228,43258,-;rtc-efi rtc-efi.0: setting system clock to 2026-09-23T14:58:39 UTC (1790175519)
+ SUBSYSTEM=platform
+ DEVICE=+platform:rtc-efi.0
+6,229,43332,-;device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+6,230,43336,-;device-mapper: uevent: version 1.0.3
+6,231,43393,-;device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+6,232,43603,-;hid: raw HID events driver (C) Jiri Kosina
+6,233,43622,-;usbcore: registered new interface driver usbhid
+6,234,43623,-;usbhid: USB HID core driver
+6,235,43764,-;drop_monitor: Initializing network drop monitor service
+6,236,43814,-;Initializing XFRM netlink socket
+6,237,43827,-;NET: Registered PF_INET6 protocol family
+6,238,43876,-;watchdog: NMI not fully supported
+6,239,43878,-;watchdog: Hard watchdog permanently disabled
+6,240,44092,-;Segment Routing with IPv6
+6,241,44093,-;RPL Segment Routing with IPv6
+6,242,44097,-;In-situ OAM (IOAM) with IPv6
+6,243,44114,-;mip6: Mobile IPv6
+6,244,44116,-;NET: Registered PF_PACKET protocol family
+6,245,44117,-;can: controller area network core
+6,246,44133,-;NET: Registered PF_CAN protocol family
+6,247,45358,-;registered taskstats version 1
+5,248,46732,-;Loading compiled-in X.509 certificates
+5,249,47665,-;Loaded X.509 cert 'Fedora kernel signing key: 62f3d6bd4db41f98b16f0c76b3f959c2fbb73bdb'
+6,250,331835,-;Freeing initrd memory: 89700K
+5,251,344131,-;Loaded X.509 cert 'Fedora IMA CA: a8a00c31663f853f9c6ff2564872e378af026b28'
+6,252,346420,-;Demotion targets for Node 0: null
+6,253,346433,-;page_owner is disabled
+5,254,346467,-;Key type .fscrypt registered
+5,255,346468,-;Key type fscrypt-provisioning registered
+6,256,346736,-;Btrfs loaded, zoned=yes, fsverity=yes
+5,257,346760,-;Key type big_key registered
+5,258,346928,-;Key type encrypted registered
+6,259,346967,-;integrity: secureboot mode disabled
+6,260,346973,-;ima: No TPM chip found, activating TPM-bypass!
+5,261,346976,-;Loading compiled-in module X.509 certificates
+5,262,347288,-;Loaded X.509 cert 'Fedora kernel signing key: 62f3d6bd4db41f98b16f0c76b3f959c2fbb73bdb'
+6,263,347413,-;ima: Allocated hash algorithm: sha256
+6,264,347545,-;ima: No architecture policies found
+6,265,347566,-;evm: Initialising EVM extended attributes:
+6,266,347568,-;evm: security.selinux
+6,267,347568,-;evm: security.SMACK64 (disabled)
+6,268,347569,-;evm: security.SMACK64EXEC (disabled)
+6,269,347570,-;evm: security.SMACK64TRANSMUTE (disabled)
+6,270,347571,-;evm: security.SMACK64MMAP (disabled)
+6,271,347572,-;evm: security.apparmor (disabled)
+6,272,347573,-;evm: security.ima
+6,273,347573,-;evm: security.capability
+6,274,347574,-;evm: HMAC attrs: 0x1
+6,275,348275,-;alg: No test for 842 (842-scomp)
+6,276,350803,-;alg: No test for mldsa87 (mldsa87-lib)
+6,277,350882,-;alg: No test for mldsa65 (mldsa65-lib)
+6,278,350962,-;alg: No test for mldsa44 (mldsa44-lib)
+6,279,356810,-;clk: Disabling unused clocks
+6,280,356815,-;PM: genpd: Disabling unused power domains
+6,281,358305,-;Freeing unused kernel memory: 15040K
+6,282,360944,-;Checked W+X mappings: passed, no W+X pages found
+6,283,360953,-;Run /init as init process
+7,284,360954,-;  with arguments:
+7,285,360955,-;    /init
+7,286,360956,-;  with environment:
+7,287,360956,-;    HOME=/
+7,288,360957,-;    TERM=linux
+7,289,360957,-;    ostree=/ostree/boot.1/fedora-coreos/f9c212adcc99e108efc95068a6183e300bbf836ddbbc7059420772b3f21f04f7/0
+30,290,375010,-;systemd[1]: Successfully made /usr/ read-only.
+30,291,375216,-;systemd[1]: systemd 259.8-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+30,292,375221,-;systemd[1]: Detected virtualization vm-other.
+30,293,375228,-;systemd[1]: Detected architecture arm64.
+30,294,375230,-;systemd[1]: Running in initrd.
+30,295,375485,-;systemd[1]: Initializing machine ID from random generator.
+30,296,375539,-;systemd[1]: No hostname configured, using default hostname.
+30,297,375607,-;systemd[1]: Hostname set to <localhost>.
+30,298,430524,-;systemd[1]: bpf-restrict-fs: LSM BPF program attached
+12,299,434730,-;ln: 
+12,300,434733,-;failed to create symbolic link '/var/log'
+12,301,434736,-;: Read-only file system
+12,302,434738,-;
+12,303,436174,-;ln: 
+12,304,436177,-;failed to create symbolic link '/var/log'
+12,305,436181,-;: Read-only file system
+12,306,436182,-;
+30,307,458896,-;systemd[1]: /usr/lib/systemd/system/systemd-udevd.service:56: System call bpf cannot be resolved as libseccomp is not available, ignoring: Operation not supported
+30,308,482276,-;systemd[1]: Queued start job for default target initrd.target.
+30,309,490932,-;systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+30,310,491040,-;systemd[1]: Started clevis-luks-askpass.path - Forward Password Requests to Clevis Directory Watch.
+30,311,491085,-;systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+30,312,491110,-;systemd[1]: Expecting device dev-disk-by\x5cx2dlabel-boot.device - /dev/disk/by-label/boot...
+30,313,491129,-;systemd[1]: Expecting device dev-disk-by\x5cx2dlabel-root.device - /dev/disk/by-label/root...
+30,314,491159,-;systemd[1]: Reached target initrd-usr-fs.target - Initrd /usr File System.
+30,315,491190,-;systemd[1]: Reached target paths.target - Path Units.
+30,316,491214,-;systemd[1]: Reached target slices.target - Slice Units.
+30,317,491235,-;systemd[1]: Reached target swap.target - Swaps.
+30,318,491253,-;systemd[1]: Reached target timers.target - Timer Units.
+30,319,491344,-;systemd[1]: Listening on dbus.socket - D-Bus System Message Bus Socket.
+30,320,491375,-;systemd[1]: Listening on iscsid.socket - Open-iSCSI iscsid Socket.
+30,321,491407,-;systemd[1]: Listening on iscsiuio.socket - Open-iSCSI iscsiuio Socket.
+30,322,491459,-;systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+30,323,491508,-;systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+30,324,491572,-;systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+30,325,491610,-;systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+30,326,491631,-;systemd[1]: Reached target sockets.target - Socket Units.
+30,327,492050,-;systemd[1]: Starting afterburn-network-kargs.service - Afterburn Initrd Setup Network Kernel Arguments...
+30,328,492084,-;systemd[1]: coreos-check-kernel.service - Check That Initrd Matches Kernel skipped, unmet condition check ConditionPathIsDirectory=!/usr/lib/modules/7.1.10-200.fc44.aarch64
+30,329,492137,-;systemd[1]: Finished coreos-teardown-initramfs.service - CoreOS Tear Down Initramfs.
+30,330,492747,-;systemd[1]: Starting coreos-touch-run-agetty.service - CoreOS: Touch /run/agetty.reload...
+30,331,493477,-;systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+30,332,494470,-;systemd[1]: Starting modprobe@dm_multipath.service - Load Kernel Module dm_multipath...
+30,333,494521,-;systemd[1]: multipathd-configure.service - Device-Mapper Multipath Default Configuration skipped, unmet condition check ConditionKernelCommandLine=rd.multipath=default
+30,334,494588,-;systemd[1]: systemd-battery-check.service - Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+30,335,495972,-;systemd[1]: Starting systemd-journald.service - Journal Service...
+30,336,496932,-;systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+30,337,496986,-;systemd[1]: systemd-pcrphase-initrd.service - TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+30,338,497002,-;systemd[1]: Reached target cryptsetup-pre.target - Local Encrypted Volumes (Pre).
+30,339,497027,-;systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+30,340,498379,-;systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+30,341,498898,-;systemd[1]: Finished afterburn-network-kargs.service - Afterburn Initrd Setup Network Kernel Arguments.
+30,342,499035,-;systemd[1]: Finished coreos-touch-run-agetty.service - CoreOS: Touch /run/agetty.reload.
+30,343,499153,-;systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+30,344,499626,-;systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+46,345,500315,-;systemd-journald[245]: Collecting audit messages is disabled.
+30,346,500755,-;systemd[1]: modprobe@dm_multipath.service: Deactivated successfully.
+30,347,500840,-;systemd[1]: Finished modprobe@dm_multipath.service - Load Kernel Module dm_multipath.
+30,348,500945,-;systemd[1]: multipathd.service - Device-Mapper Multipath Device Controller skipped, unmet condition check ConditionPathExists=/etc/multipath.conf
+6,349,501289,-;i2c_dev: i2c /dev entries driver
+6,350,502589,-;emc: device handler registered
+6,351,503550,-;rdac: device handler registered
+30,352,504141,-;systemd-modules-load[247]: Using 4 probe threads
+30,353,504218,-;systemd-modules-load[247]: Inserted module 'i2c_dev'
+30,354,504308,-;systemd-modules-load[247]: Inserted module 'scsi_dh_emc'
+30,355,504351,-;systemd-modules-load[247]: Inserted module 'scsi_dh_rdac'
+6,356,504371,-;alua: device handler registered
+30,357,504419,-;systemd-modules-load[247]: Inserted module 'scsi_dh_alua'
+30,358,504529,-;systemd[1]: Started systemd-journald.service - Journal Service.
+30,359,506935,-;systemd[1]: Starting systemd-tmpfiles-setup.service - Create System Files and Directories...
+6,360,510510,-;fuse: init (API version 7.45)
+30,361,511495,-;systemd-modules-load[247]: Inserted module 'fuse'
+30,362,511766,-;systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+30,363,511886,-;systemd[1]: import-virtiofs-systemd-credentials.service - Import systemd credentials from virtiofs skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/fs/virtiofs
+30,364,512289,-;systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+30,365,516255,-;systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+30,366,517092,-;systemd[1]: Finished systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+30,367,517631,-;systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+29,368,520728,-;systemd-tmpfiles[267]: /usr/lib/tmpfiles.d/var.conf:14: Duplicate line for path "/var/log", ignoring.
+30,369,524626,-;systemd[1]: Finished systemd-vconsole-setup.service - Virtual Console Setup.
+30,370,525305,-;systemd[1]: Starting dracut-cmdline-ask.service - dracut ask for additional cmdline parameters...
+30,371,527998,-;systemd[1]: Finished systemd-tmpfiles-setup.service - Create System Files and Directories.
+30,372,530111,-;systemd[1]: Finished systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev.
+30,373,530319,-;systemd[1]: Reached target local-fs-pre.target - Preparation for Local File Systems.
+30,374,530338,-;systemd[1]: Reached target local-fs.target - Local File Systems.
+30,375,534211,-;systemd[1]: Finished dracut-cmdline-ask.service - dracut ask for additional cmdline parameters.
+30,376,534869,-;systemd[1]: Starting dracut-cmdline.service - dracut cmdline hook...
+30,377,545134,-;dracut-cmdline[288]: dracut-108-7.fc44
+30,378,546855,-;dracut-cmdline[288]: Using kernel command line parameters:  rd.driver.pre=btrfs rd.driver.pre=virtio_gpu ip=auto   BOOT_IMAGE=(hd0,gpt3)/boot/ostree/fedora-coreos-f9c212adcc99e108efc95068a6183e300bbf836ddbbc7059420772b3f21f04f7/vmlinuz-7.1.10-200.fc44.aarch64 rw ignition.firstboot ostree.prepare-root.composefs=0 ostree=/ostree/boot.1/fedora-coreos/f9c212adcc99e108efc95068a6183e300bbf836ddbbc7059420772b3f21f04f7/0 ignition.platform.id=applehv console=tty0 console=hvc0
+6,379,585902,-;Loading iSCSI transport class v2.0-870.
+5,380,593142,-;iscsi: registered transport (tcp)
+5,381,608344,-;iscsi: registered transport (qla4xxx)
+6,382,608354,-;QLogic iSCSI HBA Driver
+6,383,614767,-;libcxgbi:libcxgbi_init_module: Chelsio iSCSI driver library libcxgbi v0.9.1-ko (Apr. 2015)
+6,384,626406,-;Chelsio T3 iSCSI Driver cxgb3i v2.0.1-ko (Apr. 2015)
+5,385,626416,-;iscsi: registered transport (cxgb3i)
+6,386,657675,-;Chelsio T4-T6 iSCSI Driver cxgb4i v0.9.5-ko (Apr. 2015)
+5,387,657701,-;iscsi: registered transport (cxgb4i)
+6,388,657703,-;cxgb4i:cxgb4i_init_module: cxgb4i dcb enabled.
+6,389,665836,-;cnic: QLogic cnicDriver v2.5.22 (July 20, 2015)
+6,390,669645,-;QLogic NetXtreme II iSCSI Driver bnx2i v2.7.10.1 (Jul 16, 2014)
+5,391,669662,-;iscsi: registered transport (bnx2i)
+5,392,678086,-;iscsi: registered transport (be2iscsi)
+6,393,678090,-;In beiscsi_module_init, tt=0000000004c4456e
+30,394,714828,-;systemd[1]: Finished dracut-cmdline.service - dracut cmdline hook.
+30,395,715750,-;systemd[1]: Starting dracut-pre-udev.service - dracut pre-udev hook...
+30,396,749017,-;systemd[1]: Finished dracut-pre-udev.service - dracut pre-udev hook.
+30,397,750150,-;systemd[1]: Starting systemd-udevd.service - Rule-based Manager for Device Events and Files...
+30,398,763290,-;systemd-udevd[482]: Using default interface naming scheme 'v259'.
+30,399,770956,-;systemd[1]: Started systemd-udevd.service - Rule-based Manager for Device Events and Files.
+30,400,771636,-;systemd[1]: Starting dracut-pre-trigger.service - dracut pre-trigger hook...
+30,401,782074,-;dracut-pre-trigger[484]: rd.md=0: removing MD RAID activation
+30,402,795436,-;systemd[1]: Finished dracut-pre-trigger.service - dracut pre-trigger hook.
+30,403,796399,-;systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+30,404,877423,-;systemd[1]: Finished systemd-udev-trigger.service - Coldplug All udev Devices.
+30,405,877721,-;systemd[1]: Reached target sysinit.target - System Initialization.
+30,406,877760,-;systemd[1]: Reached target basic.target - Basic System.
+30,407,877950,-;systemd[1]: coreos-liveiso-persist-osmet.service - Persist Osmet Files (ISO) skipped, unmet condition check ConditionKernelCommandLine=coreos.liveiso
+30,408,885715,-;systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+6,409,951221,-;input: gpio-keys as /devices/platform/gpio-keys/input/input0
+6,410,951918,-;[drm] Host memory window: 0x100000000 +0x800000000
+6,411,951923,-;[drm] features: +virgl +edid +resource_blob +host_visible
+6,412,951924,-;[drm] features: +context_init
+6,413,952088,-;[drm] KMS disabled
+6,414,952092,-;[drm] number of cap sets: 5
+6,415,953680,-;[drm] cap set 0: id 1, max-version 1, max-size 308
+6,416,953909,-;[drm] cap set 1: id 2, max-version 2, max-size 1384
+6,417,953980,-;[drm] cap set 2: id 4, max-version 0, max-size 156
+6,418,954085,-;[drm] cap set 3: id 6, max-version 0, max-size 0
+6,419,954164,-;[drm] cap set 4: id 5, max-version 0, max-size 16
+6,420,954174,-;printk: legacy console [hvc0] enabled
+6,421,956622,-;[drm] Initialized virtio_gpu 0.1.0 for a007000.virtio_mmio on minor 0
+6,422,957771,-;virtio_blk virtio7: 1/0/0 default/read/poll queues
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio7
+5,423,957980,-;virtio_blk virtio7: [vda] 209715200 512-byte logical blocks (107 GB/100 GiB)
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio7
+4,424,961520,-;GPT:Primary header thinks Alt. header is not at the end of the disk.
+4,425,961771,-;GPT:12582911 != 209715199
+4,426,961918,-;GPT:Alternate GPT header not at the end of the disk.
+4,427,962054,-;GPT:12582911 != 209715199
+4,428,962145,-;GPT: Use GNU Parted to correct GPT errors.
+6,429,962264,-; vda: vda1 vda2 vda3 vda4
+30,430,966403,-;systemd[1]: systemd-vconsole-setup.service: Deactivated successfully.
+30,431,966648,-;systemd[1]: Stopped systemd-vconsole-setup.service - Virtual Console Setup.
+30,432,967371,-;systemd[1]: Stopping systemd-vconsole-setup.service - Virtual Console Setup...
+6,433,968084,-;virtiofs virtio4: discovered new tag: a2a0ee2c717462feb1de2f5afd59de5fd2d8
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio4
+5,434,968503,-;virtiofs virtio4: virtio_fs_setup_dax: No cache capability
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio4
+30,435,968643,-;systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+6,436,972129,-;NET: Registered PF_VSOCK protocol family
+6,437,976300,-;virtiofs virtio5: discovered new tag: 71708eb255bc230cd7c91dd26f7667a7b938
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio5
+5,438,976533,-;virtiofs virtio5: virtio_fs_setup_dax: No cache capability
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio5
+6,439,978029,-;virtiofs virtio6: discovered new tag: a0bb3a2c8b0b02ba5958b0576f0d6530e104
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio6
+5,440,978272,-;virtiofs virtio6: virtio_fs_setup_dax: No cache capability
+ SUBSYSTEM=virtio
+ DEVICE=+virtio:virtio6
+30,441,1002802,-;systemd[1]: Found device dev-disk-by\x5cx2dlabel-root.device - /dev/disk/by-label/root.
+30,442,1003379,-;systemd[1]: Finished systemd-vconsole-setup.service - Virtual Console Setup.
+30,443,1014090,-;systemd[1]: Found device dev-disk-by\x5cx2dlabel-boot.device - /dev/disk/by-label/boot.
+30,444,1014849,-;systemd[1]: Starting coreos-ignition-setup-user.service - CoreOS Ignition User Config Setup...
+30,445,1015420,-;systemd[1]: Starting coreos-unique-boot.service - CoreOS Ensure Unique Boot Filesystem Label...
+6,446,1032394,-;EXT4-fs (vda3): orphan cleanup on readonly fs
+6,447,1032542,-;EXT4-fs (vda3): mounted filesystem 96d15588-3596-4b3c-adca-a2ff7279ea63 ro with ordered data mode. Quota mode: none.
+30,448,1033181,-;coreos-ignition-setup-user[570]: File /mnt/boot_partition/ignition/config.ign does not exist.. Skipping copy
+6,449,1033196,-;EXT4-fs (vda3): unmounting filesystem 96d15588-3596-4b3c-adca-a2ff7279ea63.
+30,450,1034108,-;systemd[1]: Finished coreos-ignition-setup-user.service - CoreOS Ignition User Config Setup.
+30,451,1034826,-;systemd[1]: Starting ignition-fetch-offline.service - Ignition (fetch-offline)...
+30,452,1044955,-;systemd[1]: Finished coreos-unique-boot.service - CoreOS Ensure Unique Boot Filesystem Label.
+28,453,1045967,-;(ignition)[582]: ignition-fetch-offline.service: Referenced but unset environment variable evaluates to an empty string: IGNITION_ARGS
+14,454,1059804,-;ignition[582]: Ignition 2.26.0
+14,455,1059972,-;ignition[582]: Stage: fetch-offline
+14,456,1060101,-;ignition[582]: reading system config file "/usr/lib/ignition/base.d/00-core.ign"
+14,457,1060808,-;ignition[582]: reading system config file "/usr/lib/ignition/base.d/30-afterburn-sshkeys-core.ign"
+14,458,1062339,-;ignition[582]: no config dir at "/usr/lib/ignition/base.platform.d/applehv"
+14,459,1065411,-;ignition[582]: no config URL provided
+14,460,1065544,-;ignition[582]: reading system config file "/usr/lib/ignition/user.ign"
+14,461,1065765,-;ignition[582]: no config at "/usr/lib/ignition/user.ign"
+14,462,1068595,-;ignition[582]: fetched base config from "system"
+14,463,1068733,-;ignition[582]: fetched user config from "applehv"
+14,464,1068887,-;ignition[582]: fetch-offline: fetch-offline passed
+14,465,1069019,-;ignition[582]: Ignition finished successfully
+30,466,1070003,-;systemd[1]: Finished ignition-fetch-offline.service - Ignition (fetch-offline).
+30,467,1070479,-;systemd[1]: coreos-enable-network.service - CoreOS Enable Network skipped, no trigger condition checks were met.
+30,468,1070998,-;systemd[1]: Starting coreos-copy-firstboot-network.service - Copy CoreOS Firstboot Networking Config...
+6,469,1083842,-;EXT4-fs (vda3): orphan cleanup on readonly fs
+6,470,1084011,-;EXT4-fs (vda3): mounted filesystem 96d15588-3596-4b3c-adca-a2ff7279ea63 ro with ordered data mode. Quota mode: none.
+6,471,1085443,-;EXT4-fs (vda3): unmounting filesystem 96d15588-3596-4b3c-adca-a2ff7279ea63.
+30,472,1085489,-;coreos-copy-firstboot-network[591]: info: no files to copy from /mnt/boot_partition/coreos-firstboot-network; skipping
+30,473,1086270,-;systemd[1]: Finished coreos-copy-firstboot-network.service - Copy CoreOS Firstboot Networking Config.
+30,474,1087205,-;systemd[1]: Starting coreos-gpt-setup.service - Generate New UUID For Boot Disk GPT...
+30,475,1087529,-;systemd[1]: nm-initrd.service skipped, unmet condition check ConditionPathExists=/run/NetworkManager/initrd/neednet
+30,476,1087885,-;systemd[1]: Reached target network.target - Network.
+30,477,1088060,-;systemd[1]: ignition-fetch.service - Ignition (fetch) skipped, unmet condition check ConditionPathExists=!/run/ignition.json
+30,478,1088467,-;systemd[1]: Starting ignition-ostree-transposefs-detect.service - Ignition OSTree: Detect Partition Transposition...
+30,479,1088989,-;systemd[1]: nm-wait-online-initrd.service skipped, unmet condition check ConditionPathExists=/run/NetworkManager/initrd/neednet
+30,480,1090135,-;systemd[1]: Starting dracut-initqueue.service - dracut initqueue hook...
+30,481,1097135,-;coreos-gpt-setup[600]: Randomizing disk GUID
+30,482,1097721,-;systemd[1]: Finished dracut-initqueue.service - dracut initqueue hook.
+30,483,1097989,-;systemd[1]: Reached target remote-fs-pre.target - Preparation for Remote File Systems.
+30,484,1098423,-;systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+30,485,1098743,-;systemd[1]: Reached target remote-fs.target - Remote File Systems.
+30,486,1098992,-;systemd[1]: coreos-livepxe-rootfs.service - Acquire Live PXE rootfs Image skipped, unmet condition check ConditionPathExists=/run/ostree-live
+30,487,1099412,-;systemd[1]: coreos-livepxe-persist-osmet.service - Persist Osmet Files (PXE) skipped, unmet condition check ConditionPathExists=/run/ostree-live
+30,488,1100084,-;systemd[1]: Starting dracut-pre-mount.service - dracut pre-mount hook...
+30,489,1103495,-;systemd[1]: Finished ignition-ostree-transposefs-detect.service - Ignition OSTree: Detect Partition Transposition.
+30,490,1107094,-;systemd[1]: Finished dracut-pre-mount.service - dracut pre-mount hook.
+30,491,1508143,-;systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+30,492,1521872,-;systemd[1]: Mounted sys-kernel-config.mount - Kernel Configuration File System.
+6,493,2113361,-; vda: vda1 vda2 vda3 vda4
+30,494,2114744,-;coreos-gpt-setup[615]: The operation has completed successfully.
+30,495,2174175,-;systemd[1]: Finished coreos-gpt-setup.service - Generate New UUID For Boot Disk GPT.
+30,496,2185355,-;systemd[1]: ignition-ostree-transposefs-save.service - Ignition OSTree: Save Partitions skipped, unmet condition check ConditionPathIsDirectory=/run/ignition-ostree-transposefs
+30,497,2185907,-;systemd[1]: Starting ignition-ostree-uuid-boot.service - Ignition OSTree: Regenerate Filesystem UUID (boot)...
+30,498,2206881,-;ignition-ostree-firstboot-uuid[659]: tune2fs 1.47.3 (8-Jul-2025)
+30,499,2216981,-;ignition-ostree-firstboot-uuid[657]: Regenerated UUID for /dev/disk/by-label/boot
+30,500,2217242,-;systemd[1]: Finished ignition-ostree-uuid-boot.service - Ignition OSTree: Regenerate Filesystem UUID (boot).
+30,501,2218120,-;systemd[1]: Starting ignition-kargs.service - Ignition (kargs)...
+28,502,2228289,-;(ignition)[663]: ignition-kargs.service: Referenced but unset environment variable evaluates to an empty string: IGNITION_ARGS
+14,503,2234409,-;ignition[663]: Ignition 2.26.0
+14,504,2234581,-;ignition[663]: Stage: kargs
+14,505,2234649,-;ignition[663]: reading system config file "/usr/lib/ignition/base.d/00-core.ign"
+14,506,2235168,-;ignition[663]: reading system config file "/usr/lib/ignition/base.d/30-afterburn-sshkeys-core.ign"
+14,507,2235589,-;ignition[663]: no config dir at "/usr/lib/ignition/base.platform.d/applehv"
+14,508,2236692,-;ignition[663]: kargs: kargs passed
+14,509,2236971,-;ignition[663]: Ignition finished successfully
+30,510,2238201,-;systemd[1]: Finished ignition-kargs.service - Ignition (kargs).
+30,511,2238529,-;systemd[1]: coreos-kargs-reboot.service - CoreOS Kernel Arguments Reboot skipped, unmet condition check ConditionPathExists=/run/coreos-kargs-reboot
+30,512,2239177,-;systemd[1]: Starting ignition-disks.service - Ignition (disks)...
+28,513,2247634,-;(ignition)[671]: ignition-disks.service: Referenced but unset environment variable evaluates to an empty string: IGNITION_ARGS
+14,514,2253765,-;ignition[671]: Ignition 2.26.0
+14,515,2253883,-;ignition[671]: Stage: disks
+14,516,2254016,-;ignition[671]: reading system config file "/usr/lib/ignition/base.d/00-core.ign"
+14,517,2254765,-;ignition[671]: reading system config file "/usr/lib/ignition/base.d/30-afterburn-sshkeys-core.ign"
+14,518,2255405,-;ignition[671]: no config dir at "/usr/lib/ignition/base.platform.d/applehv"
+14,519,2256779,-;ignition[671]: disks: disks passed
+14,520,2257018,-;ignition[671]: Ignition finished successfully
+30,521,2258065,-;systemd[1]: Finished ignition-disks.service - Ignition (disks).
+30,522,2258504,-;systemd[1]: Reached target initrd-root-device.target - Initrd Root Device.
+30,523,2259080,-;systemd[1]: Starting coreos-ignition-unique-boot.service - CoreOS Ignition Ensure Unique Boot Filesystem...
+6,524,2268446,-; vda: vda1 vda2 vda3 vda4
+30,525,2513100,-;systemd[1]: Finished coreos-ignition-unique-boot.service - CoreOS Ignition Ensure Unique Boot Filesystem.
+30,526,2514824,-;systemd[1]: Starting ignition-ostree-uuid-root.service - Ignition OSTree: Regenerate Filesystem UUID (root)...
+30,527,2629061,-;ignition-ostree-firstboot-uuid[698]: Clearing log and setting UUID
+30,528,2629197,-;ignition-ostree-firstboot-uuid[698]: writing all SBs
+30,529,2629374,-;ignition-ostree-firstboot-uuid[698]: new UUID = e5a723c9-9298-4a59-98ec-e1bda545428b
+30,530,2635268,-;ignition-ostree-firstboot-uuid[693]: Regenerated UUID for /dev/disk/by-label/root
+30,531,2637219,-;systemd[1]: Finished ignition-ostree-uuid-root.service - Ignition OSTree: Regenerate Filesystem UUID (root).
+30,532,2638119,-;systemd[1]: Starting ignition-ostree-growfs.service - Ignition OSTree: Grow Root Filesystem...
+6,533,2778508,-;SGI XFS with ACLs, security attributes, realtime, scrub, repair, quota, no debug enabled
+5,534,2781111,-;XFS (vda4): Mounting V5 Filesystem e5a723c9-9298-4a59-98ec-e1bda545428b
+6,535,2796323,-;XFS (vda4): Ending clean mount
+30,536,3093791,-;ignition-ostree-growfs[728]: CHANGED: partition=4 start=1050624 old: size=11530240 end=12580863 new: size=208664543 end=209715166
+30,537,4373346,-;ignition-ostree-growfs[784]: meta-data=/dev/vda4              isize=512    agcount=4, agsize=360320 blks
+30,538,4373578,-;ignition-ostree-growfs[784]:          =                       sectsz=512   attr=2, projid32bit=1
+30,539,4373775,-;ignition-ostree-growfs[784]:          =                       crc=1        finobt=1, sparse=1, rmapbt=1
+30,540,4373958,-;ignition-ostree-growfs[784]:          =                       reflink=1    bigtime=1 inobtcount=1 nrext64=1
+30,541,4374097,-;ignition-ostree-growfs[784]:          =                       exchange=0   metadir=0
+30,542,4374240,-;ignition-ostree-growfs[784]: data     =                       bsize=4096   blocks=1441280, imaxpct=25
+30,543,4374402,-;ignition-ostree-growfs[784]:          =                       sunit=0      swidth=0 blks
+30,544,4374543,-;ignition-ostree-growfs[784]: naming   =version 2              bsize=4096   ascii-ci=0, ftype=1, parent=0
+30,545,4374767,-;ignition-ostree-growfs[784]: log      =internal log           bsize=4096   blocks=16384, version=2
+5,546,4374793,-;XFS (vda4): Unmounting Filesystem e5a723c9-9298-4a59-98ec-e1bda545428b
+30,547,4374911,-;ignition-ostree-growfs[784]:          =                       sectsz=512   sunit=0 blks, lazy-count=1
+30,548,4375105,-;ignition-ostree-growfs[784]: realtime =none                   extsz=4096   blocks=0, rtextents=0
+30,549,4375241,-;ignition-ostree-growfs[784]:          =                       rgcount=0    rgsize=0 extents
+30,550,4375398,-;ignition-ostree-growfs[784]:          =                       zoned=0      start=0 reserved=0
+30,551,4375528,-;ignition-ostree-growfs[784]: data blocks changed from 1441280 to 26083067
+30,552,4378504,-;systemd[1]: Finished ignition-ostree-growfs.service - Ignition OSTree: Grow Root Filesystem.
+30,553,4379088,-;systemd[1]: Starting ignition-ostree-transposefs-autosave-xfs.service - Ignition OSTree: Autosave XFS Rootfs Partition...
+30,554,4399445,-;ignition-ostree-transposefs[789]: autosave-xfs: /dev/disk/by-label/root agcount=73 is lower than threshold=400
+30,555,4399834,-;systemd[1]: Finished ignition-ostree-transposefs-autosave-xfs.service - Ignition OSTree: Autosave XFS Rootfs Partition.
+30,556,4400384,-;systemd[1]: ignition-ostree-transposefs-restore.service - Ignition OSTree: Restore Partitions skipped, unmet condition check ConditionPathIsDirectory=/run/ignition-ostree-transposefs
+30,557,4401017,-;systemd[1]: Starting coreos-rootflags.service - Determine root FS mount option flags...
+30,558,4417515,-;systemd[1]: Finished coreos-rootflags.service - Determine root FS mount option flags.
+30,559,4418391,-;systemd[1]: Mounting sysroot.mount - /sysroot...
+5,560,4423381,-;XFS (vda4): Mounting V5 Filesystem e5a723c9-9298-4a59-98ec-e1bda545428b
+6,561,4431926,-;XFS (vda4): Ending clean mount
+5,562,4433183,-;XFS (vda4): Quotacheck needed: Please wait.
+5,563,4491612,-;XFS (vda4): Quotacheck: Done.
+30,564,4494855,-;systemd[1]: Mounted sysroot.mount - /sysroot.
+30,565,4495228,-;systemd[1]: ignition-remount-sysroot.service - Remount /sysroot read-write for Ignition skipped, unmet condition check ConditionPathIsReadWrite=!/sysroot
+30,566,4495728,-;systemd[1]: Starting ostree-prepare-root.service - OSTree Prepare OS/...
+14,567,4506574,-;ostree-prepare-root[888]: Resolved OSTree target to: /sysroot/ostree/deploy/fedora-coreos/deploy/a932125ff46224e2e858ba5d418faad6e2105f36b2f29dc364bdc63f94218675.0
+30,568,4507128,-;ostree-prepare-root[888]: sysroot.readonly configuration value: 1 (fs writable: 1)
+30,569,4507390,-;ostree-prepare-root[888]: Using legacy ostree bind mount for /
+14,570,4507533,-;ostree-prepare-root[888]: Resolved OSTree target to: /sysroot.tmp/sysroot/ostree/deploy/fedora-coreos/deploy/a932125ff46224e2e858ba5d418faad6e2105f36b2f29dc364bdc63f94218675.0
+30,571,4507845,-;systemd[1]: sysroot.mount: Deactivated successfully.
+30,572,4509178,-;systemd[1]: sysroot.tmp-sysroot.mount: Deactivated successfully.
+30,573,4509382,-;systemd[1]: sysroot.tmp-usr.mount: Deactivated successfully.
+30,574,4509489,-;systemd[1]: sysroot.tmp-etc.mount: Deactivated successfully.
+30,575,4509595,-;systemd[1]: sysroot.tmp.mount: Deactivated successfully.
+30,576,4509723,-;systemd[1]: Finished ostree-prepare-root.service - OSTree Prepare OS/.
+30,577,4510274,-;systemd[1]: bootc-root-setup.service - bootc setup root skipped, unmet condition check ConditionKernelCommandLine=composefs
+30,578,4510544,-;systemd[1]: Reached target initrd-root-fs.target - Initrd Root File System.
+30,579,4510684,-;systemd[1]: afterburn-hostname.service - Afterburn Hostname skipped, no trigger condition checks were met.
+30,580,4510961,-;systemd[1]: Starting ignition-ostree-check-rootfs-size.service - Ignition OSTree: Check Root Filesystem Size...
+30,581,4511452,-;systemd[1]: Starting ignition-ostree-mount-var.service - Mount OSTree /var...
+30,582,4519723,-;ignition-ostree-mount-var[892]: Mounting /sysroot/sysroot/ostree/deploy/fedora-coreos/var
+30,583,4521162,-;systemd[1]: Finished ignition-ostree-check-rootfs-size.service - Ignition OSTree: Check Root Filesystem Size.
+30,584,4521861,-;systemd[1]: Finished ignition-ostree-mount-var.service - Mount OSTree /var.
+30,585,4522670,-;systemd[1]: Starting ignition-mount.service - Ignition (mount)...
+28,586,4524809,-;(ignition)[907]: ignition-mount.service: Referenced but unset environment variable evaluates to an empty string: IGNITION_ARGS
+14,587,4530528,-;ignition[907]: Ignition 2.26.0
+14,588,4530740,-;ignition[907]: Stage: mount
+14,589,4530852,-;ignition[907]: reading system config file "/usr/lib/ignition/base.d/00-core.ign"
+14,590,4531564,-;ignition[907]: reading system config file "/usr/lib/ignition/base.d/30-afterburn-sshkeys-core.ign"
+14,591,4532807,-;ignition[907]: no config dir at "/usr/lib/ignition/base.platform.d/applehv"
+14,592,4533417,-;ignition[907]: mount: mount passed
+14,593,4533544,-;ignition[907]: Ignition finished successfully
+30,594,4534419,-;systemd[1]: Finished ignition-mount.service - Ignition (mount).
+30,595,4534798,-;systemd[1]: coreos-live-clear-sssd-cache.service - Clear SSSD NSS Cache in Persistent /var skipped, unmet condition check ConditionPathExists=/sysroot/var/lib/sss/mc
+30,596,4535337,-;systemd[1]: Starting ignition-ostree-populate-var.service - Populate OSTree /var...
+30,597,4564923,-;ignition-ostree-populate-var[918]: Relabeled /sysroot//var/home from <no context> to system_u:object_r:home_root_t:s0
+30,598,4578668,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome from <no context> to system_u:object_r:admin_home_t:s0
+30,599,4578903,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/buildinfo from <no context> to system_u:object_r:admin_home_t:s0
+30,600,4579125,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/buildinfo/content_manifests from <no context> to system_u:object_r:admin_home_t:s0
+30,601,4579320,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/buildinfo/content_manifests/content-sets.json from <no context> to system_u:object_r:admin_home_t:s0
+30,602,4579596,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/buildinfo/labels.json from <no context> to system_u:object_r:admin_home_t:s0
+30,603,4579801,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/.ssh from <no context> to system_u:object_r:ssh_home_t:s0
+30,604,4579949,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/.bashrc from <no context> to system_u:object_r:admin_home_t:s0
+30,605,4580114,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/.bash_profile from <no context> to system_u:object_r:admin_home_t:s0
+30,606,4580289,-;ignition-ostree-populate-var[921]: Relabeled /sysroot//var/roothome/.bash_logout from <no context> to system_u:object_r:admin_home_t:s0
+30,607,4588481,-;ignition-ostree-populate-var[924]: Relabeled /sysroot//var/opt from <no context> to system_u:object_r:usr_t:s0
+30,608,4599237,-;ignition-ostree-populate-var[927]: Relabeled /sysroot//var/srv from <no context> to system_u:object_r:var_t:s0
+30,609,4610019,-;ignition-ostree-populate-var[930]: Relabeled /sysroot//var/mnt from <no context> to system_u:object_r:mnt_t:s0
+30,610,4619392,-;systemd[1]: Finished ignition-ostree-populate-var.service - Populate OSTree /var.
+30,611,4620392,-;systemd[1]: Starting ignition-ostree-mount-state-overlays.service - Ignition OSTree Mount State Overlays...
+30,612,4629589,-;systemd[1]: Finished ignition-ostree-mount-state-overlays.service - Ignition OSTree Mount State Overlays.
+30,613,4630546,-;systemd[1]: Starting ignition-files.service - Ignition (files)...
+28,614,4637804,-;(ignition)[938]: ignition-files.service: Referenced but unset environment variable evaluates to an empty string: IGNITION_ARGS
+14,615,4643833,-;ignition[938]: Ignition 2.26.0
+14,616,4644014,-;ignition[938]: Stage: files
+14,617,4644131,-;ignition[938]: reading system config file "/usr/lib/ignition/base.d/00-core.ign"
+14,618,4644540,-;ignition[938]: reading system config file "/usr/lib/ignition/base.d/30-afterburn-sshkeys-core.ign"
+14,619,4644968,-;ignition[938]: no config dir at "/usr/lib/ignition/base.platform.d/applehv"
+14,620,4651228,-;ignition[938]: files: ensureUsers: op(1): [started]  creating or modifying user "core"
+14,621,4660923,-;ignition[938]: files: ensureUsers: op(1): [finished] creating or modifying user "core"
+14,622,4661133,-;ignition[938]: files: ensureUsers: op(2): [started]  adding ssh keys to user "core"
+14,623,4661843,-;ignition[938]: wrote ssh authorized keys file for user: core
+14,624,4661952,-;ignition[938]: files: ensureUsers: op(2): [finished] adding ssh keys to user "core"
+14,625,4662113,-;ignition[938]: files: ensureUsers: op(3): [started]  creating or modifying user "root"
+14,626,4662908,-;ignition[938]: files: ensureUsers: op(3): [finished] creating or modifying user "root"
+14,627,4663139,-;ignition[938]: files: ensureUsers: op(4): [started]  adding ssh keys to user "root"
+14,628,4663664,-;ignition[938]: wrote ssh authorized keys file for user: root
+14,629,4663780,-;ignition[938]: files: ensureUsers: op(4): [finished] adding ssh keys to user "root"
+14,630,4664121,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(5): [started]  writing file "/sysroot/etc/subuid"
+14,631,4664338,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(5): [finished] writing file "/sysroot/etc/subuid"
+14,632,4664515,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(6): [started]  writing link "/sysroot/etc/localtime" -> "../usr/share/zoneinfo/Europe/Amsterdam"
+14,633,4665027,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(6): [finished] writing link "/sysroot/etc/localtime" -> "../usr/share/zoneinfo/Europe/Amsterdam"
+14,634,4665304,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(7): [started]  writing file "/sysroot/etc/subgid"
+14,635,4665428,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(7): [finished] writing file "/sysroot/etc/subgid"
+14,636,4665576,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(8): [started]  writing file "/sysroot/etc/tmpfiles.d/podman-docker.conf"
+14,637,4666406,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(8): [finished] writing file "/sysroot/etc/tmpfiles.d/podman-docker.conf"
+14,638,4666651,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(9): [started]  writing file "/sysroot/etc/containers/podman-machine"
+14,639,4666871,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(9): [finished] writing file "/sysroot/etc/containers/podman-machine"
+14,640,4667355,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(a): [started]  writing link "/sysroot/var/usrlocal/bin/docker" -> "/usr/bin/podman"
+14,641,4667595,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(a): [finished] writing link "/sysroot/var/usrlocal/bin/docker" -> "/usr/bin/podman"
+14,642,4667727,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(b): [started]  writing file "/sysroot/var/lib/systemd/linger/core"
+14,643,4668289,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(b): [finished] writing file "/sysroot/var/lib/systemd/linger/core"
+14,644,4668967,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(c): [started]  writing link "/sysroot/etc/systemd/user/sockets.target.wants/podman.socket" -> "/usr/lib/systemd/user/podman.socket"
+14,645,4669245,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(c): [finished] writing link "/sysroot/etc/systemd/user/sockets.target.wants/podman.socket" -> "/usr/lib/systemd/user/podman.socket"
+14,646,4669720,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(d): [started]  writing file "/sysroot/var/home/core/.config/containers/containers.conf"
+14,647,4669952,-;ignition[938]: files: createFilesystemsFiles: createFiles: op(d): [finished] writing file "/sysroot/var/home/core/.config/containers/containers.conf"
+14,648,4670529,-;ignition[938]: files: op(e): [started]  processing unit "afterburn-sshkeys@core.service"
+14,649,4670745,-;ignition[938]: files: op(e): [finished] processing unit "afterburn-sshkeys@core.service"
+14,650,4670943,-;ignition[938]: files: op(f): [started]  processing unit "podman.socket"
+14,651,4671098,-;ignition[938]: files: op(f): [finished] processing unit "podman.socket"
+14,652,4671251,-;ignition[938]: files: op(10): [started]  processing unit "zincati.service"
+14,653,4671404,-;ignition[938]: files: op(10): [finished] processing unit "zincati.service"
+14,654,4671574,-;ignition[938]: files: op(11): [started]  processing unit "ready.service"
+14,655,4671721,-;ignition[938]: files: op(11): op(12): [started]  writing unit "ready.service" at "/sysroot/etc/systemd/system/ready.service"
+14,656,4671946,-;ignition[938]: files: op(11): op(12): [finished] writing unit "ready.service" at "/sysroot/etc/systemd/system/ready.service"
+14,657,4672168,-;ignition[938]: files: op(11): [finished] processing unit "ready.service"
+14,658,4672294,-;ignition[938]: files: op(13): [started]  processing unit "Users.mount"
+14,659,4672449,-;ignition[938]: files: op(13): op(14): [started]  writing unit "Users.mount" at "/sysroot/etc/systemd/system/Users.mount"
+14,660,4672611,-;ignition[938]: files: op(13): op(14): [finished] writing unit "Users.mount" at "/sysroot/etc/systemd/system/Users.mount"
+14,661,4672785,-;ignition[938]: files: op(13): [finished] processing unit "Users.mount"
+14,662,4672926,-;ignition[938]: files: op(15): [started]  processing unit "private.mount"
+14,663,4673056,-;ignition[938]: files: op(15): op(16): [started]  writing unit "private.mount" at "/sysroot/etc/systemd/system/private.mount"
+14,664,4673218,-;ignition[938]: files: op(15): op(16): [finished] writing unit "private.mount" at "/sysroot/etc/systemd/system/private.mount"
+14,665,4673367,-;ignition[938]: files: op(15): [finished] processing unit "private.mount"
+14,666,4673472,-;ignition[938]: files: op(17): [started]  processing unit "var-folders.mount"
+14,667,4673631,-;ignition[938]: files: op(17): op(18): [started]  writing unit "var-folders.mount" at "/sysroot/etc/systemd/system/var-folders.mount"
+14,668,4673860,-;ignition[938]: files: op(17): op(18): [finished] writing unit "var-folders.mount" at "/sysroot/etc/systemd/system/var-folders.mount"
+14,669,4674042,-;ignition[938]: files: op(17): [finished] processing unit "var-folders.mount"
+14,670,4674153,-;ignition[938]: files: op(19): [started]  processing unit "immutable-root-off.service"
+14,671,4674256,-;ignition[938]: files: op(19): op(1a): [started]  writing unit "immutable-root-off.service" at "/sysroot/etc/systemd/system/immutable-root-off.service"
+14,672,4674382,-;ignition[938]: files: op(19): op(1a): [finished] writing unit "immutable-root-off.service" at "/sysroot/etc/systemd/system/immutable-root-off.service"
+14,673,4674509,-;ignition[938]: files: op(19): [finished] processing unit "immutable-root-off.service"
+14,674,4674660,-;ignition[938]: files: op(1b): [started]  processing unit "immutable-root-on.service"
+14,675,4674808,-;ignition[938]: files: op(1b): op(1c): [started]  writing unit "immutable-root-on.service" at "/sysroot/etc/systemd/system/immutable-root-on.service"
+14,676,4674946,-;ignition[938]: files: op(1b): op(1c): [finished] writing unit "immutable-root-on.service" at "/sysroot/etc/systemd/system/immutable-root-on.service"
+14,677,4675072,-;ignition[938]: files: op(1b): [finished] processing unit "immutable-root-on.service"
+14,678,4675159,-;ignition[938]: files: op(1d): [started]  setting preset to enabled for "Users.mount"
+14,679,4675245,-;ignition[938]: files: op(1d): [finished] setting preset to enabled for "Users.mount"
+14,680,4675330,-;ignition[938]: files: op(1e): [started]  setting preset to enabled for "afterburn-sshkeys@.service core"
+14,681,4675432,-;ignition[938]: files: op(1e): [finished] setting preset to enabled for "afterburn-sshkeys@.service core"
+14,682,4675524,-;ignition[938]: files: op(1f): [started]  setting preset to enabled for "immutable-root-off.service"
+14,683,4675625,-;ignition[938]: files: op(1f): [finished] setting preset to enabled for "immutable-root-off.service"
+14,684,4675802,-;ignition[938]: files: op(20): [started]  setting preset to enabled for "immutable-root-on.service"
+14,685,4675977,-;ignition[938]: files: op(20): [finished] setting preset to enabled for "immutable-root-on.service"
+14,686,4676117,-;ignition[938]: files: op(21): [started]  setting preset to enabled for "podman.socket"
+14,687,4676228,-;ignition[938]: files: op(21): [finished] setting preset to enabled for "podman.socket"
+14,688,4676328,-;ignition[938]: files: op(22): [started]  setting preset to enabled for "private.mount"
+14,689,4676442,-;ignition[938]: files: op(22): [finished] setting preset to enabled for "private.mount"
+14,690,4676540,-;ignition[938]: files: op(23): [started]  setting preset to enabled for "ready.service"
+14,691,4676657,-;ignition[938]: files: op(23): [finished] setting preset to enabled for "ready.service"
+14,692,4676766,-;ignition[938]: files: op(24): [started]  setting preset to enabled for "var-folders.mount"
+14,693,4676862,-;ignition[938]: files: op(24): [finished] setting preset to enabled for "var-folders.mount"
+14,694,4676978,-;ignition[938]: files: op(25): [started]  setting preset to disabled for "zincati.service"
+14,695,4677085,-;ignition[938]: files: op(25): op(26): [started]  removing enablement symlink(s) for "zincati.service"
+14,696,4681244,-;ignition[938]: files: op(25): op(26): [finished] removing enablement symlink(s) for "zincati.service"
+14,697,4681481,-;ignition[938]: files: op(25): [finished] setting preset to disabled for "zincati.service"
+14,698,4684150,-;ignition[938]: files: createResultFile: createFiles: op(27): [started]  writing file "/sysroot/etc/.ignition-result.json"
+14,699,4684384,-;ignition[938]: files: createResultFile: createFiles: op(27): [finished] writing file "/sysroot/etc/.ignition-result.json"
+14,700,4684608,-;ignition[938]: files: op(28): [started]  relabeling 30 patterns
+14,701,4692967,-;ignition[938]: files: op(28): [finished] relabeling 30 patterns
+14,702,4693157,-;ignition[938]: files: files passed
+14,703,4693300,-;ignition[938]: Ignition finished successfully
+30,704,4693963,-;systemd[1]: Finished ignition-files.service - Ignition (files).
+30,705,4695911,-;systemd[1]: Starting coreos-boot-edit.service - CoreOS Boot Edit...
+30,706,4696440,-;systemd[1]: Starting coreos-post-ignition-checks.service - CoreOS Post Ignition Checks...
+30,707,4696745,-;systemd[1]: coreos-propagate-multipath-conf.service - CoreOS Propagate Multipath Configuration skipped, unmet condition check ConditionKernelCommandLine=rd.multipath=default
+30,708,4711980,-;systemd[1]: Finished coreos-post-ignition-checks.service - CoreOS Post Ignition Checks.
+6,709,4719242,-;EXT4-fs (vda3): mounted filesystem 04eb309e-26d6-4d51-9e07-4d9929b78e74 r/w with ordered data mode. Quota mode: none.
+30,710,4727172,-;coreos-boot-edit[999]: Injected kernel arguments into BLS: root=UUID=e5a723c9-9298-4a59-98ec-e1bda545428b rw rootflags=prjquota
+30,711,4727486,-;coreos-boot-edit[989]: Prepared rootmap
+30,712,4747469,-;coreos-boot-edit[1011]: Relabeled /sysroot//boot/.root_uuid from <no context> to system_u:object_r:boot_t:s0
+30,713,4751287,-;coreos-boot-edit[1013]: Relabeled /sysroot//boot/grub2/bootuuid.cfg from <no context> to system_u:object_r:boot_t:s0
+6,714,4753589,-;EXT4-fs (vda3): unmounting filesystem 04eb309e-26d6-4d51-9e07-4d9929b78e74.
+30,715,4755327,-;systemd[1]: Finished coreos-boot-edit.service - CoreOS Boot Edit.
+30,716,4755676,-;systemd[1]: Reached target ignition-diskful.target - Ignition Boot Disk Setup.
+30,717,4755883,-;systemd[1]: Reached target ignition-complete.target - Ignition Complete.
+30,718,4756537,-;systemd[1]: Starting initrd-parse-etc.service - Mountpoints Configured in the Real Root...
+30,719,4765154,-;systemd[1]: initrd-parse-etc.service: Deactivated successfully.
+30,720,4765343,-;systemd[1]: Finished initrd-parse-etc.service - Mountpoints Configured in the Real Root.
+30,721,4765527,-;systemd[1]: initrd-parse-etc.service: Triggering OnSuccess= dependencies.
+30,722,4765713,-;systemd[1]: Reached target initrd-fs.target - Initrd File Systems.
+30,723,4765880,-;systemd[1]: Reached target initrd.target - Initrd Default Target.
+30,724,4766026,-;systemd[1]: dracut-mount.service - dracut mount hook skipped, no trigger condition checks were met.
+30,725,4766479,-;systemd[1]: Starting dracut-pre-pivot.service - dracut pre-pivot and cleanup hook...
+30,726,4777259,-;dracut-pre-pivot[1031]: 4.776530 | /etc/multipath.conf does not exist, blacklisting all devices.
+30,727,4777689,-;dracut-pre-pivot[1031]: 4.776543 | You can run "/sbin/mpathconf --enable" to create
+30,728,4777981,-;dracut-pre-pivot[1031]: 4.776544 | /etc/multipath.conf. See man mpathconf(8) for more details
+30,729,4778239,-;dracut-pre-pivot[1031]: 4.776688 | updated bindings file /etc/multipath/bindings
+30,730,4780548,-;systemd[1]: Finished dracut-pre-pivot.service - dracut pre-pivot and cleanup hook.
+30,731,4781600,-;systemd[1]: Starting initrd-cleanup.service - Cleaning Up and Shutting Down Daemons...
+30,732,4796806,-;systemd[1]: Stopped target remote-cryptsetup.target - Remote Encrypted Volumes.
+30,733,4797112,-;systemd[1]: Stopped target timers.target - Timer Units.
+30,734,4797400,-;systemd[1]: dbus.socket: Deactivated successfully.
+30,735,4797660,-;systemd[1]: Closed dbus.socket - D-Bus System Message Bus Socket.
+30,736,4797844,-;systemd[1]: bootc-root-setup.service - bootc setup root skipped, unmet condition check ConditionKernelCommandLine=composefs
+30,737,4798096,-;systemd[1]: dracut-pre-pivot.service: Deactivated successfully.
+30,738,4798335,-;systemd[1]: Stopped dracut-pre-pivot.service - dracut pre-pivot and cleanup hook.
+30,739,4798563,-;systemd[1]: Stopped target initrd.target - Initrd Default Target.
+30,740,4798817,-;systemd[1]: Stopped target ignition-complete.target - Ignition Complete.
+30,741,4799123,-;systemd[1]: Stopped target ignition-diskful.target - Ignition Boot Disk Setup.
+30,742,4799363,-;systemd[1]: Stopped target initrd-root-device.target - Initrd Root Device.
+30,743,4799619,-;systemd[1]: Stopped target initrd-usr-fs.target - Initrd /usr File System.
+30,744,4799893,-;systemd[1]: Stopped target remote-fs.target - Remote File Systems.
+30,745,4800207,-;systemd[1]: Stopped target remote-fs-pre.target - Preparation for Remote File Systems.
+30,746,4800428,-;systemd[1]: coreos-boot-edit.service: Deactivated successfully.
+30,747,4800580,-;systemd[1]: Stopped coreos-boot-edit.service - CoreOS Boot Edit.
+30,748,4800926,-;systemd[1]: coreos-post-ignition-checks.service: Deactivated successfully.
+30,749,4801079,-;systemd[1]: Stopped coreos-post-ignition-checks.service - CoreOS Post Ignition Checks.
+30,750,4801351,-;systemd[1]: coreos-touch-run-agetty.service: Deactivated successfully.
+30,751,4801632,-;systemd[1]: Stopped coreos-touch-run-agetty.service - CoreOS: Touch /run/agetty.reload.
+30,752,4801915,-;systemd[1]: dracut-pre-mount.service: Deactivated successfully.
+30,753,4802156,-;systemd[1]: Stopped dracut-pre-mount.service - dracut pre-mount hook.
+30,754,4802275,-;systemd[1]: dracut-initqueue.service: Deactivated successfully.
+30,755,4802289,-;systemd[1]: Stopped dracut-initqueue.service - dracut initqueue hook.
+30,756,4802648,-;systemd[1]: ignition-fetch-offline.service: Deactivated successfully.
+30,757,4802935,-;systemd[1]: Stopped ignition-fetch-offline.service - Ignition (fetch-offline).
+30,758,4803174,-;systemd[1]: coreos-ignition-setup-user.service: Deactivated successfully.
+30,759,4803417,-;systemd[1]: Stopped coreos-ignition-setup-user.service - CoreOS Ignition User Config Setup.
+30,760,4803678,-;systemd[1]: ignition-files.service: Deactivated successfully.
+30,761,4803941,-;systemd[1]: Stopped ignition-files.service - Ignition (files).
+30,762,4804072,-;systemd[1]: ignition-ostree-check-rootfs-size.service: Deactivated successfully.
+30,763,4804358,-;systemd[1]: Stopped ignition-ostree-check-rootfs-size.service - Ignition OSTree: Check Root Filesystem Size.
+30,764,4804622,-;systemd[1]: Stopping ignition-ostree-mount-state-overlays.service - Ignition OSTree Mount State Overlays...
+30,765,4804888,-;systemd[1]: ignition-ostree-transposefs-autosave-xfs.service: Deactivated successfully.
+30,766,4805225,-;systemd[1]: Stopped ignition-ostree-transposefs-autosave-xfs.service - Ignition OSTree: Autosave XFS Rootfs Partition.
+30,767,4805452,-;systemd[1]: ignition-ostree-growfs.service: Deactivated successfully.
+30,768,4805467,-;systemd[1]: Stopped ignition-ostree-growfs.service - Ignition OSTree: Grow Root Filesystem.
+30,769,4805976,-;systemd[1]: ignition-ostree-uuid-root.service: Deactivated successfully.
+30,770,4806191,-;systemd[1]: Stopped ignition-ostree-uuid-root.service - Ignition OSTree: Regenerate Filesystem UUID (root).
+30,771,4808268,-;systemd[1]: initrd-cleanup.service: Deactivated successfully.
+30,772,4811932,-;systemd[1]: Finished initrd-cleanup.service - Cleaning Up and Shutting Down Daemons.
+30,773,4814046,-;systemd[1]: ignition-ostree-mount-state-overlays.service: Deactivated successfully.
+30,774,4814283,-;systemd[1]: Stopped ignition-ostree-mount-state-overlays.service - Ignition OSTree Mount State Overlays.
+30,775,4814701,-;systemd[1]: ignition-ostree-populate-var.service: Deactivated successfully.
+30,776,4814959,-;systemd[1]: Stopped ignition-ostree-populate-var.service - Populate OSTree /var.
+30,777,4815347,-;systemd[1]: Stopping ignition-mount.service - Ignition (mount)...
+28,778,4817340,-;(ignition)[1042]: ignition-mount.service: Referenced but unset environment variable evaluates to an empty string: IGNITION_ARGS
+14,779,4823544,-;ignition[1042]: Ignition 2.26.0
+14,780,4823772,-;ignition[1042]: Stage: umount
+14,781,4823885,-;ignition[1042]: reading system config file "/usr/lib/ignition/base.d/00-core.ign"
+14,782,4824534,-;ignition[1042]: reading system config file "/usr/lib/ignition/base.d/30-afterburn-sshkeys-core.ign"
+14,783,4825761,-;ignition[1042]: no config dir at "/usr/lib/ignition/base.platform.d/applehv"
+14,784,4826371,-;ignition[1042]: umount: umount passed
+14,785,4826529,-;ignition[1042]: Ignition finished successfully
+30,786,4827390,-;systemd[1]: ignition-mount.service: Deactivated successfully.
+30,787,4827600,-;systemd[1]: Stopped ignition-mount.service - Ignition (mount).
+30,788,4828059,-;systemd[1]: Stopped target network.target - Network.
+30,789,4828259,-;systemd[1]: coreos-ignition-unique-boot.service: Deactivated successfully.
+30,790,4828481,-;systemd[1]: Stopped coreos-ignition-unique-boot.service - CoreOS Ignition Ensure Unique Boot Filesystem.
+30,791,4828761,-;systemd[1]: coreos-live-unmount-tmpfs-var.service - Unmount Live /var if Persistent /var Is Configured skipped, unmet condition check ConditionPathExists=/run/ostree-live
+30,792,4829103,-;systemd[1]: Stopping coreos-teardown-initramfs.service - CoreOS Tear Down Initramfs...
+30,793,4829418,-;systemd[1]: ignition-disks.service: Deactivated successfully.
+30,794,4829673,-;systemd[1]: Stopped ignition-disks.service - Ignition (disks).
+30,795,4829686,-;systemd[1]: ignition-kargs.service: Deactivated successfully.
+30,796,4829977,-;systemd[1]: Stopped ignition-kargs.service - Ignition (kargs).
+30,797,4830713,-;systemd[1]: Stopping ignition-ostree-mount-var.service - Mount OSTree /var...
+30,798,4836262,-;systemd[1]: Stopping ignition-ostree-transposefs-detect.service - Ignition OSTree: Detect Partition Transposition...
+30,799,4837754,-;systemd[1]: ignition-ostree-uuid-boot.service: Deactivated successfully.
+30,800,4838158,-;ignition-ostree-mount-var[1050]: Unmounting /sysroot/var
+30,801,4838395,-;systemd[1]: Stopped ignition-ostree-uuid-boot.service - Ignition OSTree: Regenerate Filesystem UUID (boot).
+30,802,4838984,-;systemd[1]: coreos-gpt-setup.service: Deactivated successfully.
+30,803,4839196,-;systemd[1]: Stopped coreos-gpt-setup.service - Generate New UUID For Boot Disk GPT.
+30,804,4839612,-;systemd[1]: Stopped target basic.target - Basic System.
+30,805,4839626,-;systemd[1]: Stopped target paths.target - Path Units.
+30,806,4840044,-;systemd[1]: Stopped target slices.target - Slice Units.
+30,807,4840065,-;systemd[1]: Stopped target sockets.target - Socket Units.
+30,808,4840343,-;systemd[1]: Stopped target sysinit.target - System Initialization.
+30,809,4840683,-;systemd[1]: Stopped target cryptsetup.target - Local Encrypted Volumes.
+30,810,4840806,-;systemd[1]: systemd-ask-password-console.path: Deactivated successfully.
+30,811,4840822,-;systemd[1]: Stopped systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+30,812,4841260,-;systemd[1]: Stopped target cryptsetup-pre.target - Local Encrypted Volumes (Pre).
+30,813,4841274,-;systemd[1]: clevis-luks-askpass.path: Deactivated successfully.
+30,814,4841286,-;systemd[1]: Stopped clevis-luks-askpass.path - Forward Password Requests to Clevis Directory Watch.
+30,815,4841885,-;systemd[1]: Stopped target local-fs.target - Local File Systems.
+30,816,4842154,-;systemd[1]: Stopped target local-fs-pre.target - Preparation for Local File Systems.
+30,817,4842460,-;systemd[1]: Stopped target swap.target - Swaps.
+30,818,4842760,-;systemd[1]: iscsid.socket: Deactivated successfully.
+30,819,4843036,-;systemd[1]: Closed iscsid.socket - Open-iSCSI iscsid Socket.
+30,820,4843250,-;systemd[1]: iscsiuio.socket: Deactivated successfully.
+30,821,4843512,-;systemd[1]: Closed iscsiuio.socket - Open-iSCSI iscsiuio Socket.
+30,822,4843769,-;systemd[1]: coreos-copy-firstboot-network.service: Deactivated successfully.
+30,823,4843968,-;systemd[1]: Stopped coreos-copy-firstboot-network.service - Copy CoreOS Firstboot Networking Config.
+30,824,4844260,-;systemd[1]: coreos-livepxe-rootfs.service - Acquire Live PXE rootfs Image skipped, unmet condition check ConditionPathExists=/run/ostree-live
+30,825,4844274,-;systemd[1]: coreos-unique-boot.service: Deactivated successfully.
+30,826,4844784,-;systemd[1]: Stopped coreos-unique-boot.service - CoreOS Ensure Unique Boot Filesystem Label.
+30,827,4844969,-;systemd[1]: systemd-sysctl.service: Deactivated successfully.
+30,828,4845190,-;systemd[1]: Stopped systemd-sysctl.service - Apply Kernel Variables.
+30,829,4845426,-;systemd[1]: systemd-modules-load.service: Deactivated successfully.
+30,830,4845644,-;systemd[1]: Stopped systemd-modules-load.service - Load Kernel Modules.
+30,831,4845944,-;coreos-teardown-initramfs[1049]: info: no initramfs hostname information to propagate
+30,832,4846249,-;systemd[1]: systemd-tmpfiles-setup.service: Deactivated successfully.
+30,833,4846406,-;systemd[1]: Stopped systemd-tmpfiles-setup.service - Create System Files and Directories.
+30,834,4846616,-;systemd[1]: systemd-udev-trigger.service: Deactivated successfully.
+30,835,4846815,-;systemd[1]: Stopped systemd-udev-trigger.service - Coldplug All udev Devices.
+30,836,4847031,-;systemd[1]: dracut-pre-trigger.service: Deactivated successfully.
+30,837,4847230,-;systemd[1]: Stopped dracut-pre-trigger.service - dracut pre-trigger hook.
+30,838,4847424,-;coreos-teardown-initramfs[1068]: ls: cannot access '/sysroot/etc/sysconfig/network-scripts/': No such file or directory
+30,839,4847655,-;systemd[1]: ignition-ostree-mount-var.service: Deactivated successfully.
+30,840,4847818,-;coreos-teardown-initramfs[1049]: info: no networking config is defined in the real root
+30,841,4847974,-;systemd[1]: Stopped ignition-ostree-mount-var.service - Mount OSTree /var.
+30,842,4848134,-;systemd[1]: ignition-ostree-transposefs-detect.service: Deactivated successfully.
+30,843,4848313,-;systemd[1]: Stopped ignition-ostree-transposefs-detect.service - Ignition OSTree: Detect Partition Transposition.
+30,844,4848657,-;systemd[1]: Stopping systemd-udevd.service - Rule-based Manager for Device Events and Files...
+30,845,4853248,-;systemd[1]: systemd-udevd.service: Deactivated successfully.
+30,846,4853450,-;systemd[1]: Stopped systemd-udevd.service - Rule-based Manager for Device Events and Files.
+30,847,4854160,-;systemd[1]: systemd-udevd-control.socket: Deactivated successfully.
+30,848,4854449,-;systemd[1]: Closed systemd-udevd-control.socket - udev Control Socket.
+30,849,4854825,-;systemd[1]: dracut-pre-udev.service: Deactivated successfully.
+30,850,4855024,-;systemd[1]: Stopped dracut-pre-udev.service - dracut pre-udev hook.
+30,851,4855037,-;systemd[1]: dracut-cmdline.service: Deactivated successfully.
+30,852,4855637,-;systemd[1]: Stopped dracut-cmdline.service - dracut cmdline hook.
+30,853,4855656,-;systemd[1]: afterburn-network-kargs.service: Deactivated successfully.
+30,854,4856082,-;systemd[1]: Stopped afterburn-network-kargs.service - Afterburn Initrd Setup Network Kernel Arguments.
+30,855,4856318,-;systemd[1]: dracut-cmdline-ask.service: Deactivated successfully.
+30,856,4856568,-;systemd[1]: Stopped dracut-cmdline-ask.service - dracut ask for additional cmdline parameters.
+30,857,4856987,-;systemd[1]: Starting initrd-udevadm-cleanup-db.service - Cleanup udev Database...
+30,858,4857246,-;systemd[1]: systemd-tmpfiles-setup-dev.service: Deactivated successfully.
+30,859,4857259,-;systemd[1]: Stopped systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev.
+30,860,4858259,-;systemd[1]: systemd-tmpfiles-setup-dev-early.service: Deactivated successfully.
+30,861,4858504,-;systemd[1]: Stopped systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+30,862,4858849,-;systemd[1]: kmod-static-nodes.service: Deactivated successfully.
+30,863,4859134,-;systemd[1]: Stopped kmod-static-nodes.service - Create List of Static Device Nodes.
+30,864,4859270,-;systemd[1]: systemd-vconsole-setup.service: Deactivated successfully.
+30,865,4859410,-;systemd[1]: Stopped systemd-vconsole-setup.service - Virtual Console Setup.
+30,866,4861642,-;coreos-teardown-initramfs[1049]: info: skipping propagation of default networking configs
+30,867,4863042,-;systemd[1]: initrd-udevadm-cleanup-db.service: Deactivated successfully.
+30,868,4863258,-;systemd[1]: Finished initrd-udevadm-cleanup-db.service - Cleanup udev Database.
+30,869,4865353,-;coreos-teardown-initramfs[1049]: info: taking down network device: eth0
+30,870,4866352,-;coreos-teardown-initramfs[1100]: RTNETLINK answers: Operation not supported
+30,871,4868727,-;coreos-teardown-initramfs[1049]: info: flushing all routing
+30,872,4871684,-;systemd[1]: coreos-teardown-initramfs.service: Deactivated successfully.
+30,873,4871933,-;systemd[1]: Stopped coreos-teardown-initramfs.service - CoreOS Tear Down Initramfs.
+30,874,4872477,-;systemd[1]: Reached target initrd-switch-root.target - Switch Root.
+30,875,4873285,-;systemd[1]: Starting initrd-switch-root.service - Switch Root...
+29,876,4887894,-;systemd[1]: Switching root.
+46,877,4931242,-;systemd-journald[245]: Received SIGTERM from PID 1 (systemd).
+5,878,4972946,-;audit: type=1404 audit(1790175524.429:2): enforcing=1 old_enforcing=0 auid=4294967295 ses=4294967295 enabled=1 old-enabled=1 lsm=selinux res=1
+6,879,4992385,-;SELinux:  Permission firmware_load in class system not defined in policy.
+6,880,4992573,-;SELinux:  Permission kexec_image_load in class system not defined in policy.
+6,881,4992671,-;SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+6,882,4992781,-;SELinux:  Permission policy_load in class system not defined in policy.
+6,883,4992874,-;SELinux:  Permission x509_certificate_load in class system not defined in policy.
+6,884,4993005,-;SELinux:  Permission map_create_as in class bpf not defined in policy.
+6,885,4993101,-;SELinux:  Permission prog_load_as in class bpf not defined in policy.
+6,886,4993204,-;SELinux:  Permission allowed in class io_uring not defined in policy.
+6,887,4993314,-;SELinux:  Class memfd_file not defined in policy.
+6,888,4993408,-;SELinux: the above unknown classes and permissions will be allowed
+6,889,4995053,-;SELinux:  policy capability network_peer_controls=1
+6,890,4995190,-;SELinux:  policy capability open_perms=1
+6,891,4995273,-;SELinux:  policy capability extended_socket_class=1
+6,892,4995404,-;SELinux:  policy capability always_check_network=0
+6,893,4995514,-;SELinux:  policy capability cgroup_seclabel=1
+6,894,4995625,-;SELinux:  policy capability nnp_nosuid_transition=1
+6,895,4995730,-;SELinux:  policy capability genfs_seclabel_symlinks=1
+6,896,4995881,-;SELinux:  policy capability ioctl_skip_cloexec=0
+6,897,4996014,-;SELinux:  policy capability userspace_initial_context=0
+6,898,4996138,-;SELinux:  policy capability netlink_xperm=0
+6,899,4996249,-;SELinux:  policy capability netif_wildcard=0
+6,900,4996332,-;SELinux:  policy capability genfs_seclabel_wildcard=0
+6,901,4996424,-;SELinux:  policy capability functionfs_seclabel=0
+6,902,4996534,-;SELinux:  policy capability memfd_class=0
+6,903,4996652,-;SELinux:  policy capability bpf_token_perms=0
+5,904,5015293,-;audit: type=1403 audit(1790175524.471:3): auid=4294967295 ses=4294967295 lsm=selinux res=1
+30,905,5015854,-;systemd[1]: Successfully loaded SELinux policy in 43.123ms.
+30,906,5374146,-;systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 12.687ms.
+30,907,5721211,-;systemd[1]: systemd 259.8-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+30,908,5723828,-;systemd[1]: Detected virtualization vm-other.
+30,909,5724104,-;systemd[1]: Detected architecture arm64.
+30,910,5724504,-;systemd[1]: Detected first boot.
+30,911,5733127,-;systemd[1]: Initializing machine ID from random generator.
+30,912,5813200,-;systemd[1]: bpf-restrict-fs: LSM BPF program attached
+13,913,5828289,-;zram_generator::config[1144]: No configuration found.
+5,914,5838477,-;audit: type=1400 audit(1790175525.294:4): avc:  denied  { write } for  pid=1118 comm="coreos-boot-mou" name="generator" dev="tmpfs" ino=1590 scontext=system_u:system_r:coreos_boot_mount_generator_t:s0 tcontext=system_u:object_r:systemd_generator_unit_file_t:s0 tclass=dir permissive=1
+5,915,5842317,-;audit: type=1400 audit(1790175525.298:5): avc:  denied  { execute } for  pid=1168 comm="coreos-sshd-gen" name="sshd" dev="vda4" ino=8531652 scontext=system_u:system_r:systemd_generic_generator_t:s0 tcontext=system_u:object_r:sshd_exec_t:s0 tclass=file permissive=1
+5,916,5842691,-;audit: type=1400 audit(1790175525.298:6): avc:  denied  { execute_no_trans } for  pid=1168 comm="coreos-sshd-gen" path="/usr/bin/sshd" dev="vda4" ino=8531652 scontext=system_u:system_r:systemd_generic_generator_t:s0 tcontext=system_u:object_r:sshd_exec_t:s0 tclass=file permissive=1
+5,917,5846688,-;audit: type=1400 audit(1790175525.303:7): avc:  denied  { setgid } for  pid=1168 comm="sshd" capability=6  scontext=system_u:system_r:systemd_generic_generator_t:s0 tcontext=system_u:system_r:systemd_generic_generator_t:s0 tclass=capability permissive=1
+5,918,5850378,-;audit: type=1400 audit(1790175525.306:8): avc:  denied  { getattr } for  pid=1118 comm="coreos-boot-mou" path="/run/coreos/bootfs_uuid" dev="tmpfs" ino=1556 scontext=system_u:system_r:coreos_boot_mount_generator_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=file permissive=1
+5,919,5852133,-;audit: type=1400 audit(1790175525.308:9): avc:  denied  { read } for  pid=1175 comm="cat" name="bootfs_uuid" dev="tmpfs" ino=1556 scontext=system_u:system_r:coreos_boot_mount_generator_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=file permissive=1
+5,920,5852491,-;audit: type=1400 audit(1790175525.308:10): avc:  denied  { open } for  pid=1175 comm="cat" path="/run/coreos/bootfs_uuid" dev="tmpfs" ino=1556 scontext=system_u:system_r:coreos_boot_mount_generator_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=file permissive=1
+5,921,5852920,-;audit: type=1400 audit(1790175525.308:11): avc:  denied  { create } for  pid=1168 comm="sshd" scontext=system_u:system_r:systemd_generic_generator_t:s0 tcontext=system_u:system_r:systemd_generic_generator_t:s0 tclass=netlink_route_socket permissive=1
+5,922,5853269,-;audit: type=1400 audit(1790175525.308:12): avc:  denied  { bind } for  pid=1168 comm="sshd" scontext=system_u:system_r:systemd_generic_generator_t:s0 tcontext=system_u:system_r:systemd_generic_generator_t:s0 tclass=netlink_route_socket permissive=1
+30,923,5869838,-;systemd[1]: Applying preset policy.
+30,924,5995253,-;systemd[1]: Unit /etc/systemd/system/dnsmasq.service is masked, ignoring.
+30,925,5995467,-;systemd[1]: Unit /etc/systemd/system/systemd-repart.service is masked, ignoring.
+30,926,5995637,-;systemd[1]: Removed '/etc/systemd/system/multi-user.target.wants/coreos-platform-chrony-config.service'.
+30,927,5995786,-;systemd[1]: Removed '/etc/systemd/system/multi-user.target.wants/coreos-warn-invalid-mounts.service'.
+30,928,5995944,-;systemd[1]: Removed '/etc/systemd/system/multi-user.target.wants/rhsmcertd.service'.
+30,929,5996084,-;systemd[1]: Created symlink '/etc/systemd/system/default.target.requires/ready.service' \xe2\x86\x92 '/etc/systemd/system/ready.service'.
+30,930,5996247,-;systemd[1]: Created symlink '/etc/systemd/system/local-fs.target.wants/Users.mount' \xe2\x86\x92 '/etc/systemd/system/Users.mount'.
+30,931,5996402,-;systemd[1]: Created symlink '/etc/systemd/system/local-fs.target.wants/private.mount' \xe2\x86\x92 '/etc/systemd/system/private.mount'.
+30,932,5996592,-;systemd[1]: Created symlink '/etc/systemd/system/local-fs.target.wants/var-folders.mount' \xe2\x86\x92 '/etc/systemd/system/var-folders.mount'.
+30,933,5996766,-;systemd[1]: Created symlink '/etc/systemd/system/local-fs-pre.target.wants/immutable-root-off.service' \xe2\x86\x92 '/etc/systemd/system/immutable-root-off.service'.
+30,934,5996965,-;systemd[1]: Created symlink '/etc/systemd/system/local-fs.target.wants/immutable-root-on.service' \xe2\x86\x92 '/etc/systemd/system/immutable-root-on.service'.
+30,935,5997145,-;systemd[1]: Created symlink '/etc/systemd/system/sockets.target.wants/podman.socket' \xe2\x86\x92 '/usr/lib/systemd/system/podman.socket'.
+30,936,5997302,-;systemd[1]: Created symlink '/etc/systemd/system/afterburn-sshkeys.target.requires/afterburn-sshkeys@core.service' \xe2\x86\x92 '/usr/lib/systemd/system/afterburn-sshkeys@.service'.
+30,937,5997508,-;systemd[1]: Populated /etc with preset unit settings.
+30,938,6143353,-;systemd[1]: initrd-switch-root.service: Deactivated successfully.
+30,939,6143649,-;systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+30,940,6144668,-;systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+30,941,6145226,-;systemd[1]: Created slice system-afterburn\x5cx2dsshkeys.slice - Slice /system/afterburn-sshkeys.
+30,942,6145665,-;systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+30,943,6146080,-;systemd[1]: Created slice system-serial\x5cx2dgetty.slice - Slice /system/serial-getty.
+30,944,6146470,-;systemd[1]: Created slice system-sshd\x5cx2dkeygen.slice - Slice /system/sshd-keygen.
+30,945,6146885,-;systemd[1]: Created slice system-systemd\x5cx2dfsck.slice - Slice /system/systemd-fsck.
+30,946,6147218,-;systemd[1]: Created slice user.slice - User and Session Slice.
+30,947,6147443,-;systemd[1]: Started clevis-luks-askpass.path - Forward Password Requests to Clevis Directory Watch.
+30,948,6147828,-;systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+30,949,6148073,-;systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+30,950,6148482,-;systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+30,951,6148841,-;systemd[1]: Expecting device dev-disk-by\x5cx2duuid-04eb309e\x5cx2d26d6\x5cx2d4d51\x5cx2d9e07\x5cx2d4d9929b78e74.device - /dev/disk/by-uuid/04eb309e-26d6-4d51-9e07-4d9929b78e74...
+30,952,6149231,-;systemd[1]: Expecting device dev-hvc0.device - /dev/hvc0...
+30,953,6149404,-;systemd[1]: Reached target imports.target - Image Downloads.
+30,954,6149595,-;systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+30,955,6149769,-;systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+30,956,6149974,-;systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+30,957,6150145,-;systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+30,958,6150355,-;systemd[1]: Reached target slices.target - Slice Units.
+30,959,6150527,-;systemd[1]: Reached target swap.target - Swaps.
+30,960,6150708,-;systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+30,961,6151159,-;systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+30,962,6151864,-;systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+30,963,6153418,-;systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+30,964,6155070,-;systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+30,965,6156091,-;systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+30,966,6157329,-;systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+30,967,6157911,-;systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+30,968,6158245,-;systemd[1]: Listening on systemd-mountfsd.socket - DDI File System Mounter Socket.
+30,969,6159424,-;systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+30,970,6159881,-;systemd[1]: Listening on systemd-nsresourced.socket - Namespace Resource Manager Socket.
+30,971,6160175,-;systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+30,972,6160331,-;systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+30,973,6161265,-;systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+30,974,6163201,-;systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+30,975,6163523,-;systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+30,976,6163943,-;systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+30,977,6165026,-;systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+30,978,6165756,-;systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+30,979,6173455,-;systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+30,980,6183892,-;systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+30,981,6185243,-;systemd[1]: Mounting tmp.mount - Temporary Directory /tmp...
+30,982,6188753,-;systemd[1]: auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS skipped, unmet condition check ConditionPathExists=/etc/krb5.keytab
+30,983,6190164,-;systemd[1]: Starting coreos-printk-quiet.service - CoreOS: Set printk To Level 4 (warn)...
+30,984,6190445,-;systemd[1]: coreos-rootflags.service: Deactivated successfully.
+30,985,6190583,-;systemd[1]: Stopped coreos-rootflags.service.
+30,986,6190809,-;systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1
+30,987,6191032,-;systemd[1]: ignition-delete-config.service - Ignition (delete config) skipped, no trigger condition checks were met.
+30,988,6192142,-;systemd[1]: Starting immutable-root-off.service - Allow systemd to create mount points on /...
+30,989,6193492,-;systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+30,990,6194336,-;systemd[1]: Starting lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+30,991,6194629,-;systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+30,992,6194881,-;systemd[1]: modprobe@dm_multipath.service - Load Kernel Module dm_multipath skipped, unmet condition check ConditionKernelModuleLoaded=!dm_multipath
+30,993,6195111,-;systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+30,994,6195124,-;systemd[1]: modprobe@efi_pstore.service - Load Kernel Module efi_pstore skipped, unmet condition check ConditionKernelModuleLoaded=!efi_pstore
+30,995,6195140,-;systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+30,996,6196564,-;systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+30,997,6197079,-;systemd[1]: ostree-prepare-root.service: Deactivated successfully.
+30,998,6197277,-;systemd[1]: Stopped ostree-prepare-root.service - OSTree Prepare OS/.
+30,999,6197534,-;systemd[1]: systemd-boot-clear-sysfail.service - Clear SysFail Entry If The Boot Is Successful skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/LoaderEntrySysFail-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f
+30,1000,6197838,-;systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+30,1001,6199752,-;systemd[1]: Starting systemd-journald.service - Journal Service...
+30,1002,6201058,-;systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+30,1003,6201846,-;systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+30,1004,6202082,-;systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+30,1005,6203489,-;systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+30,1006,6203881,-;systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+30,1007,6204111,-;systemd[1]: systemd-pcrnvdone.service - TPM PCR NvPCR Initialization Separator skipped, unmet condition check ConditionPathExists=/etc/initrd-release
+30,1008,6204325,-;systemd[1]: Reached target cryptsetup-pre.target - Local Encrypted Volumes (Pre).
+30,1009,6204590,-;systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+30,1010,6206421,-;systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+30,1011,6214391,-;systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+46,1012,6215602,-;systemd-journald[1199]: Collecting audit messages is enabled.
+30,1013,6216980,-;systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+30,1014,6217353,-;systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+30,1015,6217614,-;systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+30,1016,6217858,-;systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+30,1017,6218092,-;systemd[1]: Mounted tmp.mount - Temporary Directory /tmp.
+30,1018,6218414,-;systemd[1]: Finished coreos-printk-quiet.service - CoreOS: Set printk To Level 4 (warn).
+30,1019,6218778,-;systemd[1]: immutable-root-off.service: Deactivated successfully.
+30,1020,6219041,-;systemd[1]: Finished immutable-root-off.service - Allow systemd to create mount points on /.
+30,1021,6219389,-;systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+30,1022,6219658,-;systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+30,1023,6220046,-;systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+30,1024,6220662,-;systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+30,1025,6221093,-;systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+30,1026,6221393,-;systemd[1]: Reached target network-pre.target - Preparation for Network.
+30,1027,6221627,-;systemd[1]: multipathd.service - Device-Mapper Multipath Device Controller skipped, unmet condition check ConditionPathExists=/etc/multipath.conf
+30,1028,6221857,-;systemd[1]: iscsi-onboot.service - Special handling of early boot iSCSI sessions skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/iscsi_session
+30,1029,6223613,-;systemd[1]: Starting systemd-hwdb-update.service - Rebuild Hardware Database...
+30,1030,6224463,-;systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+30,1031,6227664,-;systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+30,1032,6228033,-;systemd[1]: Started systemd-journald.service - Journal Service.
+6,1033,6256048,-;tun: Universal TUN/TAP device driver, 1.6
+6,1034,6710162,-;Free page reporting enabled
+4,1035,7171072,-;virtio-fs: response too short (0)
+4,1036,7171080,-;virtio-fs: response too short (0)
+6,1037,7180809,-;EXT4-fs (vda3): orphan cleanup on readonly fs
+6,1038,7180875,-;EXT4-fs (vda3): mounted filesystem 04eb309e-26d6-4d51-9e07-4d9929b78e74 ro with ordered data mode. Quota mode: none.
+4,1039,7192774,-;virtio-fs: response too short (0)
+46,1040,7222700,-;systemd-journald[1199]: Received client request to flush runtime journal.
+6,1041,7577465,-;EXT4-fs (vda3): re-mounted 04eb309e-26d6-4d51-9e07-4d9929b78e74 r/w.
+6,1042,7621025,-;EXT4-fs (vda3): re-mounted 04eb309e-26d6-4d51-9e07-4d9929b78e74.
+6,1043,8187908,-;RPC: Registered named UNIX socket transport module.
+6,1044,8187913,-;RPC: Registered udp transport module.
+6,1045,8187913,-;RPC: Registered tcp transport module.
+6,1046,8187914,-;RPC: Registered tcp-with-tls transport module.
+6,1047,8187914,-;RPC: Registered tcp NFSv4.1 backchannel transport module.
+6,1048,8280290,-;evm: overlay not supported
+13,1049,8772776,-;zram_generator::config[1910]: No configuration found.
+6,1050,11179123878,-;bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+6,1051,11179130000,-;podman0: port 1(veth0) entered blocking state
+6,1052,11179130004,-;podman0: port 1(veth0) entered disabled state
+6,1053,11179130008,-;veth0: entered allmulticast mode
+6,1054,11179130031,-;veth0: entered promiscuous mode
+6,1055,11179130882,-;podman0: port 1(veth0) entered blocking state
+6,1056,11179130884,-;podman0: port 1(veth0) entered forwarding state
+4,1057,11179281338,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1058,14363626706,-;podman0: port 2(veth1) entered blocking state
+6,1059,14363626735,-;podman0: port 2(veth1) entered disabled state
+6,1060,14363626741,-;veth1: entered allmulticast mode
+6,1061,14363626811,-;veth1: entered promiscuous mode
+6,1062,14363627212,-;podman0: port 2(veth1) entered blocking state
+6,1063,14363627216,-;podman0: port 2(veth1) entered forwarding state
+4,1064,14363675129,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1065,14936542852,-;podman0: port 3(veth2) entered blocking state
+6,1066,14936542857,-;podman0: port 3(veth2) entered disabled state
+6,1067,14936542860,-;veth2: entered allmulticast mode
+6,1068,14936542893,-;veth2: entered promiscuous mode
+6,1069,14936543354,-;podman0: port 3(veth2) entered blocking state
+6,1070,14936543372,-;podman0: port 3(veth2) entered forwarding state
+4,1071,14936584796,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1072,14936617533,-;podman0: port 3(veth2) entered disabled state
+6,1073,14936617866,-;veth2 (unregistering): left allmulticast mode
+6,1074,14936617878,-;veth2 (unregistering): left promiscuous mode
+6,1075,14936617896,-;podman0: port 3(veth2) entered disabled state
+6,1076,14936734013,-;podman0: port 3(veth2) entered blocking state
+6,1077,14936734019,-;podman0: port 3(veth2) entered disabled state
+6,1078,14936734022,-;veth2: entered allmulticast mode
+6,1079,14936734110,-;veth2: entered promiscuous mode
+6,1080,14936734297,-;podman0: port 3(veth2) entered blocking state
+6,1081,14936734303,-;podman0: port 3(veth2) entered forwarding state
+4,1082,14936780345,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1083,14936837965,-;podman0: port 3(veth2) entered disabled state
+6,1084,14936838308,-;veth2 (unregistering): left allmulticast mode
+6,1085,14936838310,-;veth2 (unregistering): left promiscuous mode
+6,1086,14936838324,-;podman0: port 3(veth2) entered disabled state
+6,1087,14936920589,-;podman0: port 3(veth2) entered blocking state
+6,1088,14936920595,-;podman0: port 3(veth2) entered disabled state
+6,1089,14936920602,-;veth2: entered allmulticast mode
+6,1090,14936920638,-;veth2: entered promiscuous mode
+6,1091,14936920925,-;podman0: port 3(veth2) entered blocking state
+6,1092,14936920928,-;podman0: port 3(veth2) entered forwarding state
+4,1093,14936964637,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1094,14937009581,-;podman0: port 3(veth2) entered disabled state
+6,1095,14937009904,-;veth2 (unregistering): left allmulticast mode
+6,1096,14937009907,-;veth2 (unregistering): left promiscuous mode
+6,1097,14937009919,-;podman0: port 3(veth2) entered disabled state
+6,1098,14937084266,-;podman0: port 3(veth2) entered blocking state
+6,1099,14937084273,-;podman0: port 3(veth2) entered disabled state
+6,1100,14937084277,-;veth2: entered allmulticast mode
+6,1101,14937084325,-;veth2: entered promiscuous mode
+6,1102,14937084517,-;podman0: port 3(veth2) entered blocking state
+6,1103,14937084519,-;podman0: port 3(veth2) entered forwarding state
+4,1104,14937124759,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1105,14937159913,-;podman0: port 3(veth2) entered disabled state
+6,1106,14937160177,-;veth2 (unregistering): left allmulticast mode
+6,1107,14937160180,-;veth2 (unregistering): left promiscuous mode
+6,1108,14937160188,-;podman0: port 3(veth2) entered disabled state
+6,1109,14937222052,-;podman0: port 3(veth2) entered blocking state
+6,1110,14937222059,-;podman0: port 3(veth2) entered disabled state
+6,1111,14937222064,-;veth2: entered allmulticast mode
+6,1112,14937222144,-;veth2: entered promiscuous mode
+6,1113,14937222383,-;podman0: port 3(veth2) entered blocking state
+6,1114,14937222386,-;podman0: port 3(veth2) entered forwarding state
+4,1115,14937252811,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1116,14937282734,-;podman0: port 3(veth2) entered disabled state
+6,1117,14937283005,-;veth2 (unregistering): left allmulticast mode
+6,1118,14937283008,-;veth2 (unregistering): left promiscuous mode
+6,1119,14937283017,-;podman0: port 3(veth2) entered disabled state
+6,1120,14937341640,-;podman0: port 3(veth2) entered blocking state
+6,1121,14937341645,-;podman0: port 3(veth2) entered disabled state
+6,1122,14937341648,-;veth2: entered allmulticast mode
+6,1123,14937341689,-;veth2: entered promiscuous mode
+6,1124,14937341808,-;podman0: port 3(veth2) entered blocking state
+6,1125,14937341810,-;podman0: port 3(veth2) entered forwarding state
+4,1126,14937368819,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1127,14937404126,-;podman0: port 3(veth2) entered disabled state
+6,1128,14937404354,-;veth2 (unregistering): left allmulticast mode
+6,1129,14937404373,-;veth2 (unregistering): left promiscuous mode
+6,1130,14937404388,-;podman0: port 3(veth2) entered disabled state
+6,1131,14937499856,-;podman0: port 3(veth2) entered blocking state
+6,1132,14937499862,-;podman0: port 3(veth2) entered disabled state
+6,1133,14937499865,-;veth2: entered allmulticast mode
+6,1134,14937499902,-;veth2: entered promiscuous mode
+6,1135,14937500038,-;podman0: port 3(veth2) entered blocking state
+6,1136,14937500039,-;podman0: port 3(veth2) entered forwarding state
+4,1137,14937553722,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)
+6,1138,14937588681,-;podman0: port 3(veth2) entered disabled state
+6,1139,14937588944,-;veth2 (unregistering): left allmulticast mode
+6,1140,14937588947,-;veth2 (unregistering): left promiscuous mode
+6,1141,14937588958,-;podman0: port 3(veth2) entered disabled state
+6,1142,15177211366,-;podman0: port 3(veth2) entered blocking state
+6,1143,15177211375,-;podman0: port 3(veth2) entered disabled state
+6,1144,15177211384,-;veth2: entered allmulticast mode
+6,1145,15177211498,-;veth2: entered promiscuous mode
+6,1146,15177211734,-;podman0: port 3(veth2) entered blocking state
+6,1147,15177211736,-;podman0: port 3(veth2) entered forwarding state
+6,1148,15177211849,-;podman0: port 3(veth2) entered disabled state
+6,1149,15177211940,-;podman0: port 3(veth2) entered blocking state
+6,1150,15177211942,-;podman0: port 3(veth2) entered forwarding state
+4,1151,15177267921,-;SELinux: mount invalid.  Same superblock, different security settings for (dev cgroup2, type cgroup2)

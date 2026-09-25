@@ -1,0 +1,44 @@
+use super::Report;
+
+pub fn render(report: &Report) -> String {
+    let mut s = serde_json::to_string_pretty(report).expect("report is always serializable");
+    s.push('\n');
+    s
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::check::Section;
+    use crate::report::Sampling;
+    use crate::sysinfo::SysInfo;
+
+    #[test]
+    fn json_is_parseable_and_has_all_sections() {
+        let mut warn = Section::new("disk", "Disk I/O", "iostat -xz 1");
+        warn.warn("busy");
+        warn.metric("util_pct", 93.0);
+        let r = Report::new(
+            SysInfo::default(),
+            Sampling {
+                interval: 1.0,
+                count: 5,
+            },
+            vec![
+                Section::new("load", "Load", "uptime"),
+                warn,
+                Section::new("x", "X", "x").skipped("gone"),
+            ],
+        );
+        let v: serde_json::Value = serde_json::from_str(&render(&r)).unwrap();
+        assert_eq!(v["overall"], "WARN");
+        assert_eq!(v["sampling"]["count"], 5);
+        let sections = v["sections"].as_array().unwrap();
+        assert_eq!(sections.len(), 3);
+        assert_eq!(sections[1]["equivalent"], "iostat -xz 1");
+        assert_eq!(sections[1]["metrics"]["util_pct"], 93.0);
+        assert_eq!(sections[1]["findings"][0]["level"], "warn");
+        assert_eq!(sections[2]["status"], "SKIPPED");
+        assert!(v["system"].is_object());
+    }
+}
