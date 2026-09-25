@@ -216,7 +216,8 @@ fn evaluate_cpu(mut s: Section, w: &[(f64, Stat)], cpus: f64, online: f64) -> Se
             ),
         );
     }
-    s.threshold(
+    s.threshold_on(
+        Resource::Disk,
         p.wa,
         20.0,
         50.0,

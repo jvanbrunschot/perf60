@@ -139,7 +139,8 @@ pub fn render(r: &Report, color: bool, verbose: bool) -> String {
     ] {
         let n = r.count(st);
         if n > 0 {
-            counts.push(format!("{n} {name}"));
+            let plural = if n > 1 && st == Status::Warn { "s" } else { "" };
+            counts.push(format!("{n} {name}{plural}"));
         }
     }
     let counts = if counts.is_empty() {
@@ -149,10 +150,32 @@ pub fn render(r: &Report, color: bool, verbose: bool) -> String {
     };
     let _ = writeln!(
         out,
-        "\n{} {}{counts}\n",
+        "\n{} {}{counts}",
         p.bold("OVERALL:"),
         p.status(r.overall)
     );
+    if let Some(d) = &r.diagnosis {
+        let _ = writeln!(
+            out,
+            "{} {}",
+            p.bold("Likely bottleneck:"),
+            p.wrap(
+                if d.status == Status::Crit {
+                    "31;1"
+                } else {
+                    "33;1"
+                },
+                &d.bottleneck
+            )
+        );
+        for e in &d.evidence {
+            let _ = writeln!(out, "  {} {e}", p.dim("·"));
+        }
+        if !d.also.is_empty() {
+            let _ = writeln!(out, "  {} {}", p.dim("also:"), d.also.join(", "));
+        }
+    }
+    out.push('\n');
 
     let width = r.sections.iter().map(|s| s.id.len()).max().unwrap_or(0) + 1;
     let indent = 7 + width;
@@ -226,7 +249,7 @@ mod tests {
         );
         assert!(first.ends_with("sampled 4×0.5s"), "{first}");
         assert!(t.contains("cgroup cpu 1.5"));
-        assert!(t.contains("OVERALL: WARN  (1 warning)"));
+        assert!(t.contains("OVERALL: WARN  (1 warning)\nLikely bottleneck: disk I/O\n  · disk: vda saturated\n\n"), "{t}");
         assert!(t.contains("[ OK ] load"));
         assert!(t.contains("[WARN] disk vda util 93%"), "{t}");
         assert!(t.contains("! vda saturated"));

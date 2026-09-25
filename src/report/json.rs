@@ -32,6 +32,9 @@ mod tests {
         );
         let v: serde_json::Value = serde_json::from_str(&render(&r)).unwrap();
         assert_eq!(v["overall"], "WARN");
+        assert_eq!(v["diagnosis"]["bottleneck"], "disk I/O");
+        assert_eq!(v["diagnosis"]["resource"], "disk");
+        assert_eq!(v["diagnosis"]["evidence"][0], "disk: busy");
         assert_eq!(v["sampling"]["count"], 5);
         let sections = v["sections"].as_array().unwrap();
         assert_eq!(sections.len(), 3);
@@ -42,5 +45,19 @@ mod tests {
         assert_eq!(sections[1]["findings"][0]["level"], "warn");
         assert_eq!(sections[2]["status"], "SKIPPED");
         assert!(v["system"].is_object());
+    }
+
+    #[test]
+    fn diagnosis_is_null_when_all_ok() {
+        let r = Report::new(
+            SysInfo::default(),
+            Sampling {
+                interval: 1.0,
+                count: 1,
+            },
+            vec![Section::new("load", "Load", "uptime", Resource::Cpu)],
+        );
+        let v: serde_json::Value = serde_json::from_str(&render(&r)).unwrap();
+        assert!(v["diagnosis"].is_null());
     }
 }

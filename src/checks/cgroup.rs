@@ -407,19 +407,21 @@ fn events_part(s: &mut Section, first: &OwnSnap, last: &OwnSnap) -> Option<Strin
             b.oom_kill, b.max, b.high
         ));
         if oom > 0 {
-            s.crit(format!(
+            s.crit_on(Resource::Memory, format!(
                 "{oom} OOM kills in this cgroup during the window: its memory limit is too low for the workload"
             ));
         }
         if max > 0 {
-            s.warn(format!(
-                "hit memory.max {max} times during the window: reclaim or OOM imminent"
-            ));
+            s.warn_on(
+                Resource::Memory,
+                format!("hit memory.max {max} times during the window: reclaim or OOM imminent"),
+            );
         }
         if high > 0 {
-            s.note(format!(
-                "throttled at memory.high {high} times during the window"
-            ));
+            s.note_on(
+                Resource::Memory,
+                format!("throttled at memory.high {high} times during the window"),
+            );
         }
         let parts: Vec<String> = [
             (oom, "OOM kills"),
@@ -445,7 +447,7 @@ fn events_part(s: &mut Section, first: &OwnSnap, last: &OwnSnap) -> Option<Strin
         "memory.failcnt in window: {hits} (since creation: {b})"
     ));
     if hits > 0 {
-        s.warn(format!(
+        s.warn_on(Resource::Memory, format!(
             "hit the memory limit {hits} times during the window (memory.failcnt): reclaim or OOM imminent"
         ));
         Some(format!("{hits} memory limit hits"))

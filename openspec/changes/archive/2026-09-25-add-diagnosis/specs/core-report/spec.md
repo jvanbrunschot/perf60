@@ -1,74 +1,6 @@
-# core-report Specification
+# Spec Delta
 
-## Purpose
-Defines how perf60 is invoked, how it samples the system, how individual checks report
-their status, and how the overall report and exit code are produced.
-
-## Requirements
-
-### Requirement: Command-line interface
-The tool SHALL accept `--interval <seconds>` (default 1, a positive number), `--count <n>`
-(default 5, integer ≥ 1), `--json`, `--no-color`, `-v/--verbose`, `-h/--help` and
-`-V/--version`. Invalid or unknown arguments SHALL print an error with usage to stderr and exit
-with code 3.
-
-#### Scenario: Defaults
-- **WHEN** perf60 is run without arguments
-- **THEN** it samples for 5 intervals of 1 second and prints the text report
-
-#### Scenario: Invalid argument
-- **WHEN** perf60 is run with `--count 0` or `--bogus`
-- **THEN** it prints an error and usage to stderr and exits with code 3
-
-#### Scenario: Verbose flag
-- **WHEN** perf60 is run with `-v`
-- **THEN** the text report includes detail lines for every section
-
-### Requirement: No external commands
-The tool SHALL NOT execute any external program. All data SHALL come from files under
-`/proc`, `/sys`, `/etc` and `/dev/kmsg`, or from direct system calls.
-
-#### Scenario: Minimal container
-- **WHEN** perf60 runs in a container with no procps, sysstat or shell utilities
-- **THEN** it produces a complete report
-
-### Requirement: Sampling
-The tool SHALL take `count + 1` snapshots spaced `interval` seconds apart. Rate metrics
-SHALL use the measured elapsed time between snapshots. Rate-based checks SHALL report the
-average over the whole window and SHALL report the peak interval where the check spec says so.
-
-#### Scenario: Window length
-- **WHEN** run with `--interval 0.5 --count 4`
-- **THEN** the report header states the sampling window as 4×0.5s and the run takes about 2 seconds
-
-### Requirement: Check status
-Each check SHALL produce a section with status OK, WARN, CRIT or SKIPPED, a one-line summary,
-optional detail lines, optional findings, and machine-readable metrics. A section's status SHALL be
-the most severe of its findings, or OK when there are none.
-
-#### Scenario: Finding escalates section
-- **WHEN** a check records a WARN finding and no CRIT finding
-- **THEN** the section status is WARN
-
-### Requirement: Graceful degradation
-When a check's data source is missing or unreadable, the check SHALL be reported as SKIPPED
-with the reason, and the remaining checks SHALL still run.
-
-#### Scenario: Missing source
-- **WHEN** a source file of one check does not exist
-- **THEN** that section is SKIPPED with a reason naming the file, and the other sections are reported
-
-### Requirement: Overall status and exit code
-The overall status SHALL be the most severe status among non-SKIPPED sections, or OK when all
-are OK or SKIPPED. The exit code SHALL be 0 for OK, 1 for WARN and 2 for CRIT.
-
-#### Scenario: Warning exit code
-- **WHEN** the most severe section status is WARN
-- **THEN** the overall status is WARN and the exit code is 1
-
-#### Scenario: Skipped does not fail
-- **WHEN** one section is SKIPPED and the others are OK
-- **THEN** the overall status is OK and the exit code is 0
+## MODIFIED Requirements
 
 ### Requirement: Text report
 The text report SHALL start with a one-line system summary, then the overall status with WARN
@@ -122,13 +54,7 @@ concerns another resource than its section. `resource` SHALL be one of `cpu`, `m
 - **WHEN** every section is OK or SKIPPED
 - **THEN** `diagnosis` is `null`
 
-### Requirement: Non-Linux hosts
-On operating systems other than Linux, the tool SHALL print that it supports Linux only and exit
-with code 3.
-
-#### Scenario: macOS
-- **WHEN** perf60 runs on macOS
-- **THEN** it prints "perf60 supports Linux only" and exits with code 3
+## ADDED Requirements
 
 ### Requirement: Diagnosis
 The report SHALL derive a likely bottleneck from the WARN and CRIT findings of all non-SKIPPED

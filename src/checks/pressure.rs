@@ -177,8 +177,14 @@ fn report(s: &mut Section, prefix: &str, name: &str, why: &str, w: &Window, full
     }
     s.detail(d);
 
+    let resource = match name {
+        "cpu" => Resource::Cpu,
+        "memory" => Resource::Memory,
+        _ => Resource::Disk,
+    };
     s.metric(format!("{key}{name}_some_pct"), w.some);
-    s.threshold(
+    s.threshold_on(
+        resource,
         w.some,
         SOME_WARN,
         SOME_CRIT,
@@ -195,7 +201,7 @@ fn report(s: &mut Section, prefix: &str, name: &str, why: &str, w: &Window, full
     if let Some(f) = full {
         s.metric(format!("{key}{name}_full_pct"), f);
         if f > FULL_WARN {
-            s.warn(format!(
+            s.warn_on(resource, format!(
                 "{prefix}{name} full pressure {f:.1}% of the window: all non-idle tasks stalled at once"
             ));
         }

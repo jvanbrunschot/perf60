@@ -1,5 +1,6 @@
 //! Report model plus text and JSON renderers.
 
+pub mod diagnosis;
 pub mod json;
 pub mod text;
 
@@ -20,6 +21,8 @@ pub struct Report {
     pub sampling: Sampling,
     pub system: SysInfo,
     pub overall: Status,
+    /// Likely bottleneck across sections; `null` when nothing is WARN or CRIT.
+    pub diagnosis: Option<diagnosis::Diagnosis>,
     pub sections: Vec<Section>,
 }
 
@@ -28,6 +31,7 @@ impl Report {
         Report {
             version: env!("CARGO_PKG_VERSION"),
             overall: overall(&sections),
+            diagnosis: diagnosis::diagnose(&sections),
             sampling,
             system,
             sections,
