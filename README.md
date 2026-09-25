@@ -46,7 +46,8 @@ base=https://github.com/jvanbrunschot/perf60/releases/download/v$v
 curl -LO $base/perf60-$v-$arch-linux-musl -LO $base/SHA256SUMS
 grep "perf60-$v-$arch-" SHA256SUMS | shasum -a 256 -c -
 gh attestation verify perf60-$v-$arch-linux-musl --repo jvanbrunschot/perf60   # optional: built by CI from this repo
-scp perf60-$v-$arch-linux-musl server:/tmp/perf60
+chmod +x perf60-$v-$arch-linux-musl   # downloads are not executable
+scp -p perf60-$v-$arch-linux-musl server:/tmp/perf60
 ssh server 'sudo /tmp/perf60'
 ```
 
