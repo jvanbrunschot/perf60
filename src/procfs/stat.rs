@@ -6,6 +6,7 @@
 //! cpu0 3251 0 2950 1504796 83 3904 1446 0 0 0
 //! intr 6038201 0 43350 ...
 //! ctxt 6111240
+//! processes 55596
 //! procs_running 1
 //! procs_blocked 0
 //! ```
@@ -69,6 +70,8 @@ pub struct Stat {
     pub ctxt: Option<u64>,
     /// Total interrupts serviced (first number of the `intr` line).
     pub intr: Option<u64>,
+    /// Forks since boot.
+    pub processes: Option<u64>,
     pub procs_running: Option<u64>,
     pub procs_blocked: Option<u64>,
 }
@@ -112,6 +115,7 @@ pub fn parse(input: &str) -> Result<Stat> {
             }
             "ctxt" => stat.ctxt = first(),
             "intr" => stat.intr = first(),
+            "processes" => stat.processes = first(),
             "procs_running" => stat.procs_running = first(),
             "procs_blocked" => stat.procs_blocked = first(),
             _ => {
@@ -137,24 +141,33 @@ mod tests {
         assert_eq!(
             s.total,
             CpuTimes {
-                user: 13120,
+                user: 26210,
                 nice: 2,
-                system: 11810,
-                idle: 6021544,
-                iowait: 367,
-                irq: 14428,
-                softirq: 4610,
+                system: 19425,
+                idle: 7783341,
+                iowait: 857,
+                irq: 20523,
+                softirq: 6597,
                 ..Default::default()
             }
         );
         assert_eq!(s.cpus.len(), 4);
         assert_eq!(s.cpus[2].0, 2);
-        assert_eq!(s.cpus[0].1.user, 3251);
+        assert_eq!(s.cpus[0].1.user, 6007);
         assert_eq!(s.cpus[3].1.nice, 1);
-        assert_eq!(s.ctxt, Some(6111240));
-        assert_eq!(s.intr, Some(6038201));
+        assert_eq!(s.ctxt, Some(11879317));
+        assert_eq!(s.intr, Some(10375061));
+        assert_eq!(s.processes, Some(55596));
         assert_eq!(s.procs_running, Some(1));
         assert_eq!(s.procs_blocked, Some(0));
+    }
+
+    #[test]
+    fn parses_processes_counter() {
+        let s = parse(include_str!("../../tests/fixtures/linux-legacy/proc/stat")).unwrap();
+        assert_eq!(s.processes, Some(1234567));
+        assert_eq!(parse("cpu 1 2 3 4\n").unwrap().processes, None);
+        assert_eq!(parse("cpu 1 2 3 4\nprocesses x\n").unwrap().processes, None);
     }
 
     #[test]

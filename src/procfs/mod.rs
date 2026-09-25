@@ -1,14 +1,22 @@
 //! Pure parsers for kernel text interfaces. No I/O here: every function takes the file content
 //! as `&str` so it can be tested against fixtures on any OS.
 
+pub mod cgroup;
 pub mod diskstats;
 pub mod kmsg;
+pub mod limits;
 pub mod loadavg;
 pub mod meminfo;
+pub mod mounts;
 pub mod net_dev;
 pub mod pid_stat;
+pub mod platform;
 pub mod pressure;
+pub mod schedstat;
 pub mod snmp;
+pub mod sockstat;
+pub mod softirqs;
+pub mod softnet;
 pub mod stat;
 pub mod system;
 pub mod vmstat;

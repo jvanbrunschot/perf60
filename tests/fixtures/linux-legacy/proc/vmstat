@@ -1,0 +1,16 @@
+nr_free_pages 61278
+pgpgin 12345678
+pgpgout 23456789
+pswpin 1021
+pswpout 4410
+pgfault 987654321
+pgmajfault 45123
+pgscan_kswapd_normal 1203344
+pgscan_kswapd_dma32 22001
+pgscan_direct_normal 1201
+pgscan_direct_dma32 10
+pgsteal_kswapd_normal 1100000
+workingset_refault 88123
+compact_stall 12
+numa_hit 0
+numa_miss 0

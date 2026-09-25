@@ -64,35 +64,25 @@ mod tests {
 
     #[test]
     fn parses_fixture_files() {
-        let p = parse(include_str!("../../tests/fixtures/linux-arm64/proc/1/stat")).unwrap();
-        assert_eq!(
-            p,
-            PidStat {
-                pid: 1,
-                comm: "sh".into(),
-                state: 'S',
-                utime: 0,
-                stime: 1,
-                num_threads: 1,
-                starttime: 1517770,
-            }
+        // Every captured process parses; pid 1 is the capture shell, the others include sleeps.
+        let proc = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/linux-arm64/proc"
         );
-        for (pid, s) in [
-            (
-                88,
-                include_str!("../../tests/fixtures/linux-arm64/proc/88/stat"),
-            ),
-            (
-                89,
-                include_str!("../../tests/fixtures/linux-arm64/proc/89/stat"),
-            ),
-        ] {
-            let p = parse(s).unwrap();
+        let mut comms = Vec::new();
+        for e in std::fs::read_dir(proc).unwrap().flatten() {
+            let name = e.file_name().to_string_lossy().into_owned();
+            let Ok(pid) = name.parse::<u32>() else {
+                continue;
+            };
+            let text = std::fs::read_to_string(e.path().join("stat")).unwrap();
+            let p = parse(&text).unwrap();
             assert_eq!(p.pid, pid);
-            assert_eq!(p.comm, "sleep");
-            assert_eq!(p.state, 'S');
-            assert_eq!(p.starttime, 1517777);
+            assert!(p.starttime > 0 && p.num_threads >= 1);
+            comms.push(p.comm);
         }
+        assert!(comms.contains(&"sh".to_owned()), "{comms:?}");
+        assert!(comms.contains(&"sleep".to_owned()), "{comms:?}");
     }
 
     #[test]

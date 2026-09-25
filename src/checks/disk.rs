@@ -2,7 +2,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::check::{Check, Context, SampleError, Section};
+use crate::check::{Check, Context, Resource, SampleError, Section};
 use crate::procfs::diskstats::{self, DiskStat};
 use crate::source::Source;
 
@@ -90,7 +90,7 @@ impl Check for Disk {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("disk", "Disk I/O", "iostat -xz 1");
+        let s = Section::new("disk", "Disk I/O", "iostat -xz 1", Resource::Disk);
         let (Some(first), Some(last)) = (&self.first, &self.last) else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };

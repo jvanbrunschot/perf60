@@ -41,6 +41,23 @@ impl Status {
     }
 }
 
+/// The resource a section is about, used to correlate findings into a diagnosis.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Resource {
+    Cpu,
+    Memory,
+    Disk,
+    Network,
+    /// Filesystem space and system-wide limits (fds, pids, conntrack, ports).
+    Capacity,
+    Hardware,
+    /// Kernel log events, which can concern any resource.
+    Kernel,
+    /// PSI spans cpu, memory and io; findings name the resource.
+    Pressure,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Level {
@@ -61,6 +78,7 @@ pub struct Section {
     pub title: &'static str,
     /// The command from the article this section replaces, e.g. `iostat -xz 1`.
     pub equivalent: &'static str,
+    pub resource: Resource,
     pub status: Status,
     pub summary: String,
     pub details: Vec<String>,
@@ -69,11 +87,17 @@ pub struct Section {
 }
 
 impl Section {
-    pub fn new(id: &'static str, title: &'static str, equivalent: &'static str) -> Self {
+    pub fn new(
+        id: &'static str,
+        title: &'static str,
+        equivalent: &'static str,
+        resource: Resource,
+    ) -> Self {
         Section {
             id,
             title,
             equivalent,
+            resource,
             status: Status::Ok,
             summary: String::new(),
             details: Vec::new(),
@@ -213,7 +237,7 @@ mod tests {
 
     #[test]
     fn warn_finding_escalates_section() {
-        let mut s = Section::new("x", "X", "x");
+        let mut s = Section::new("x", "X", "x", Resource::Kernel);
         s.note("fyi");
         assert_eq!(s.status, Status::Ok);
         s.warn("hmm");
@@ -227,7 +251,7 @@ mod tests {
 
     #[test]
     fn threshold_boundaries_are_exclusive() {
-        let mut s = Section::new("x", "X", "x");
+        let mut s = Section::new("x", "X", "x", Resource::Kernel);
         assert!(!s.threshold(60.0, 60.0, 90.0, "at warn"));
         assert_eq!(s.status, Status::Ok);
         assert!(s.threshold(60.1, 60.0, 90.0, "above warn"));
@@ -238,11 +262,11 @@ mod tests {
 
     #[test]
     fn overall_ignores_skipped() {
-        let ok = Section::new("a", "A", "a");
-        let skip = Section::new("b", "B", "b").skipped("gone");
+        let ok = Section::new("a", "A", "a", Resource::Kernel);
+        let skip = Section::new("b", "B", "b", Resource::Kernel).skipped("gone");
         assert_eq!(overall(&[ok.clone(), skip.clone()]), Status::Ok);
         assert_eq!(overall(&[ok.clone(), skip.clone()]).exit_code(), 0);
-        let mut warn = Section::new("c", "C", "c");
+        let mut warn = Section::new("c", "C", "c", Resource::Kernel);
         warn.warn("w");
         assert_eq!(overall(&[ok, skip, warn]), Status::Warn);
         assert_eq!(Status::Warn.exit_code(), 1);
@@ -252,7 +276,7 @@ mod tests {
 
     #[test]
     fn skipped_section_is_not_escalated() {
-        let mut s = Section::new("a", "A", "a").skipped("no file");
+        let mut s = Section::new("a", "A", "a", Resource::Kernel).skipped("no file");
         s.crit("x");
         assert_eq!(s.status, Status::Skipped);
     }

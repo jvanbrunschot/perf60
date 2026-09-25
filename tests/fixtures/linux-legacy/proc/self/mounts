@@ -1,0 +1,8 @@
+rootfs / rootfs rw 0 0
+sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+devtmpfs /dev devtmpfs rw,nosuid,size=1929168k,nr_inodes=482292,mode=755 0 0
+tmpfs /run tmpfs rw,nosuid,nodev,mode=755 0 0
+/dev/mapper/centos-root / xfs rw,relatime,attr2,inode64,noquota 0 0
+/dev/sda1 /boot xfs rw,relatime,attr2,inode64,noquota 0 0
+/dev/mapper/centos-data /var/lib/app xfs rw,relatime,attr2,inode64,noquota 0 0

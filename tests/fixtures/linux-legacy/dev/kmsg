@@ -1,0 +1,6 @@
+6,0,0,-;Initializing cgroup subsys cpuset
+5,1,0,-;Linux version 3.10.0-1160.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) #1 SMP Mon Oct 19 16:18:59 UTC 2020
+6,2,1000,-;Command line: BOOT_IMAGE=/vmlinuz-3.10.0-1160.el7.x86_64 root=/dev/mapper/centos-root ro
+4,3,812345678,-;EDAC MC0: 1 CE memory read error on CPU_SrcID#0_Ha#0_Chan#1_DIMM#0
+6,4,850000000000,-;app[4211]: segfault at 0 ip 00007f3a2c1d4e10 sp 00007ffd9a2b3c80 error 4 in libc-2.17.so[7f3a2c0a0000+1c4000]
+6,5,863990000000,-;e1000: eth0 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: None

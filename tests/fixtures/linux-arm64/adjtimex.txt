@@ -1,0 +1,5 @@
+offset 0
+maxerror 62770
+esterror 1664
+status 8192
+state 0

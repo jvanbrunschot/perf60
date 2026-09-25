@@ -1,7 +1,7 @@
 //! `free -m` and the si/so columns of `vmstat 1`: available memory against RAM and the cgroup
 //! limit, OOM kills, and swapping during the sampling window.
 
-use crate::check::{Check, Context, SampleError, Section, rate};
+use crate::check::{Check, Context, Resource, SampleError, Section, rate};
 use crate::procfs::meminfo::{self, MemInfo};
 use crate::procfs::system;
 use crate::procfs::vmstat::{self, VmStat};
@@ -11,6 +11,8 @@ use crate::units;
 const MEMINFO: &str = "/proc/meminfo";
 const VMSTAT: &str = "/proc/vmstat";
 const CGROUP_V1: &str = "/sys/fs/cgroup/memory";
+/// A second NUMA node: only then are NUMA misses worth judging.
+const NODE1: &str = "/sys/devices/system/node/node1";
 
 /// Available memory below these percentages of MemTotal is WARN / CRIT.
 const AVAIL_WARN_PCT: f64 = 10.0;
@@ -20,6 +22,10 @@ const CGROUP_WARN_PCT: f64 = 90.0;
 const CGROUP_CRIT_PCT: f64 = 95.0;
 /// si + so above this many pages/s (about 1 MiB/s with 4 KiB pages) is CRIT; any is WARN.
 const SWAP_CRIT_PAGES: f64 = 256.0;
+/// Page-cache refaults above this many pages/s is WARN (thrashing).
+const REFAULT_WARN: f64 = 1000.0;
+/// NUMA misses above this percentage of NUMA allocations get a note.
+const NUMA_MISS_NOTE_PCT: f64 = 10.0;
 
 /// `a` as a percentage of `b`; 0 when `b` is 0 (never NaN).
 fn pct(a: u64, b: u64) -> f64 {
@@ -73,15 +79,21 @@ pub struct Memory {
     cgroup: Option<CgroupMem>,
     /// `oom_kill` at the first and the last sample that had it.
     oom: Option<(u64, u64)>,
+    /// `/proc/vmstat` at the first and the latest readable sample.
+    vm: Option<VmWindow>,
+    /// A second NUMA node exists.
+    numa: bool,
     error: SampleError,
 }
+
+type VmWindow = ((f64, VmStat), (f64, VmStat));
 
 impl Check for Memory {
     fn id(&self) -> &'static str {
         "memory"
     }
 
-    fn sample(&mut self, src: &dyn Source, _t: f64) {
+    fn sample(&mut self, src: &dyn Source, t: f64) {
         if let Some(s) = self.error.read(src, MEMINFO) {
             match meminfo::parse(&s) {
                 Ok(m) => {
@@ -91,24 +103,82 @@ impl Check for Memory {
                 Err(e) => self.error.record(MEMINFO, &std::io::Error::other(e.0)),
             }
         }
-        // OOM kills are optional: older kernels have no counter, and vmstat may be unreadable.
-        if let Some(n) = src
+        // vmstat is optional: older kernels lack counters, and it may be unreadable.
+        if let Some(v) = src
             .read_to_string(VMSTAT)
             .ok()
             .and_then(|s| vmstat::parse(&s).ok())
-            .and_then(|v| v.get("oom_kill"))
         {
-            let first = self.oom.map_or(n, |(f, _)| f);
-            self.oom = Some((first, n));
+            if let Some(n) = v.get("oom_kill") {
+                let first = self.oom.map_or(n, |(f, _)| f);
+                self.oom = Some((first, n));
+            }
+            match &mut self.vm {
+                Some((_, last)) => *last = (t, v),
+                None => self.vm = Some(((t, v.clone()), (t, v))),
+            }
         }
+        self.numa |= src.exists(NODE1);
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("memory", "Memory", "free -m");
+        let s = Section::new("memory", "Memory", "free -m", Resource::Memory);
         let Some(m) = &self.mem else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };
-        evaluate_memory(s, m, self.cgroup, self.oom)
+        let mut s = evaluate_memory(s, m, self.cgroup, self.oom);
+        if let Some(vm) = &self.vm {
+            reclaim_signals(&mut s, vm, self.numa);
+        }
+        s
+    }
+}
+
+/// Thrashing, compaction stalls and NUMA misses from `/proc/vmstat` deltas over the window.
+/// Each counter is optional; a missing one only omits its signal.
+fn reclaim_signals(s: &mut Section, vm: &VmWindow, numa: bool) {
+    let ((t0, a), (t1, b)) = vm;
+    let delta = |k: &str| Some(b.get(k)?.saturating_sub(a.get(k)?));
+
+    // workingset_refault was split into _anon and _file in 5.9; page cache is the _file part.
+    let refaults = |v: &VmStat| {
+        v.get("workingset_refault_file")
+            .or_else(|| v.get("workingset_refault"))
+    };
+    if let (Some(x), Some(y)) = (refaults(a), refaults(b)) {
+        let r = rate((*t0, x), (*t1, y));
+        s.metric("refaults_per_sec", r);
+        if r > REFAULT_WARN {
+            s.warn(format!(
+                "page cache thrashing: working set does not fit in memory ({} refaults/s)",
+                num(r)
+            ));
+        }
+    }
+
+    if let Some(d) = delta("compact_stall") {
+        s.metric("compact_stalls", d as f64);
+        if d > 0 {
+            s.note(format!(
+                "{d} memory compaction stalls during the window: allocations waited for \
+                 compaction (often transparent huge pages)"
+            ));
+        }
+    }
+
+    if numa
+        && let (Some(hit), Some(miss)) = (delta("numa_hit"), delta("numa_miss"))
+        && hit + miss > 0
+    {
+        let p = pct(miss, hit + miss);
+        s.metric("numa_miss_pct", p);
+        if p > NUMA_MISS_NOTE_PCT {
+            s.note(format!(
+                "NUMA miss ratio {}%: allocations land on a remote node \
+                 (check CPU and memory placement)",
+                pct_str(p)
+            ));
+        }
     }
 }
 
@@ -350,7 +420,7 @@ impl Check for Swap {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("swap", "Swapping", "vmstat 1 (si/so)");
+        let s = Section::new("swap", "Swapping", "vmstat 1 (si/so)", Resource::Memory);
         let (Some(first), Some(last)) = (&self.first, &self.last) else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };
@@ -476,9 +546,9 @@ mod tests {
         assert_eq!(s.status, Status::Ok);
         assert_eq!(
             s.summary,
-            "available 1.4 GiB of 1.9 GiB (74%), buffers 1.3 MiB, cached 440 MiB, swap 0 B/0 B"
+            "available 1.3 GiB of 1.9 GiB (69%), buffers 204 KiB, cached 1.2 GiB, swap 0 B/0 B"
         );
-        assert!(s.details[0].contains("shared 1.1 MiB"), "{:?}", s.details);
+        assert!(s.details[0].contains("shared 1 MiB"), "{:?}", s.details);
         assert_eq!(s.metrics["total_bytes"], 1986320.0 * 1024.0);
         assert_eq!(s.metrics["swap_used_bytes"], 0.0);
         assert!(!s.metrics.contains_key("cgroup_used_pct"));
@@ -650,6 +720,107 @@ mod tests {
         let s = memory(&src);
         assert!(!s.metrics.contains_key("oom_kills"));
         assert!(s.findings.is_empty());
+    }
+
+    /// Two samples 10 s apart with the given vmstat texts; `numa` adds a second node.
+    fn vm_run(t0: &str, t1: &str, numa: bool) -> Section {
+        let src = MemSource::new()
+            .with(MEMINFO, &meminfo(1000000, 900000))
+            .with(VMSTAT, t0);
+        if numa {
+            src.set(&format!("{NODE1}/cpulist"), "1\n");
+        }
+        let mut c = Memory::default();
+        c.sample(&src, 0.0);
+        src.set(VMSTAT, t1);
+        c.sample(&src, 10.0);
+        c.evaluate(&ctx())
+    }
+
+    fn refaults(n: u64) -> String {
+        format!("workingset_refault_anon 7\nworkingset_refault_file {n}\ncompact_stall 0\n")
+    }
+
+    #[test]
+    fn refault_thresholds() {
+        let s = vm_run(&refaults(5000), &refaults(15_000), false);
+        assert_eq!(s.metrics["refaults_per_sec"], 1000.0);
+        assert_eq!(s.status, Status::Ok, "{:?}", s.findings);
+        let s = vm_run(&refaults(5000), &refaults(15_001), false);
+        assert_eq!(s.status, Status::Warn);
+        assert!(
+            has(&s, Level::Warn, "page cache thrashing"),
+            "{:?}",
+            s.findings
+        );
+        assert_eq!(s.metrics["refaults_per_sec"], 1000.1);
+    }
+
+    #[test]
+    fn legacy_refault_counter() {
+        let s = vm_run(
+            "workingset_refault 100\n",
+            "workingset_refault 20100\n",
+            false,
+        );
+        assert_eq!(s.metrics["refaults_per_sec"], 2000.0);
+        assert_eq!(s.status, Status::Warn);
+        // Without either counter there is no refault signal.
+        let s = vm_run("pswpin 0\n", "pswpin 0\n", false);
+        assert!(!s.metrics.contains_key("refaults_per_sec"));
+        assert!(!s.metrics.contains_key("compact_stalls"));
+    }
+
+    #[test]
+    fn compaction_stall_note() {
+        let s = vm_run("compact_stall 10\n", "compact_stall 13\n", false);
+        assert_eq!(s.metrics["compact_stalls"], 3.0);
+        assert_eq!(s.status, Status::Ok);
+        assert!(
+            has(&s, Level::Note, "3 memory compaction stalls"),
+            "{:?}",
+            s.findings
+        );
+        let s = vm_run("compact_stall 10\n", "compact_stall 10\n", false);
+        assert_eq!(s.metrics["compact_stalls"], 0.0);
+        assert!(s.findings.is_empty(), "{:?}", s.findings);
+    }
+
+    #[test]
+    fn numa_miss_ratio() {
+        let numa = |hit: u64, miss: u64, nodes: bool| {
+            vm_run(
+                "numa_hit 1000\nnuma_miss 1000\n",
+                &format!("numa_hit {}\nnuma_miss {}\n", 1000 + hit, 1000 + miss),
+                nodes,
+            )
+        };
+        let s = numa(90, 10, true);
+        assert_eq!(s.metrics["numa_miss_pct"], 10.0);
+        assert!(s.findings.is_empty(), "{:?}", s.findings);
+        let s = numa(89, 11, true);
+        assert_eq!(s.status, Status::Ok);
+        assert!(
+            has(&s, Level::Note, "NUMA miss ratio 11%"),
+            "{:?}",
+            s.findings
+        );
+        // Single node: not judged.
+        let s = numa(0, 50, false);
+        assert!(!s.metrics.contains_key("numa_miss_pct"));
+        assert!(s.findings.is_empty());
+        // No NUMA allocations during the window.
+        let s = numa(0, 0, true);
+        assert!(!s.metrics.contains_key("numa_miss_pct"));
+    }
+
+    #[test]
+    fn no_vmstat_omits_latency_signals() {
+        let s = memory(&MemSource::new().with(MEMINFO, &meminfo(1000000, 900000)));
+        assert_eq!(s.status, Status::Ok);
+        for k in ["refaults_per_sec", "compact_stalls", "numa_miss_pct"] {
+            assert!(!s.metrics.contains_key(k), "{k}");
+        }
     }
 
     #[test]

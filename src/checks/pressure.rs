@@ -1,7 +1,7 @@
 //! `top / PSI`: Pressure Stall Information for CPU, memory and I/O, system-wide and for our own
 //! cgroup v2. The window percentages come from the cumulative `total=` counters (µs).
 
-use crate::check::{Check, Context, SampleError, Section, rate};
+use crate::check::{Check, Context, Resource, SampleError, Section, rate};
 use crate::procfs::pressure::{self, Psi};
 use crate::procfs::system;
 use crate::source::Source;
@@ -108,7 +108,12 @@ impl Check for Pressure {
     }
 
     fn evaluate(&self, ctx: &Context) -> Section {
-        let mut s = Section::new("pressure", "Pressure stall (PSI)", "top / PSI");
+        let mut s = Section::new(
+            "pressure",
+            "Pressure stall (PSI)",
+            "top / PSI",
+            Resource::Pressure,
+        );
         if self.system[0].last.is_none() {
             let reason = if self.no_psi {
                 SKIP_REASON

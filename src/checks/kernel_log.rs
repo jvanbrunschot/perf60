@@ -1,6 +1,6 @@
 //! `dmesg | tail`: recent kernel errors such as OOM kills, hung tasks, I/O errors and SYN floods.
 
-use crate::check::{Check, Context, Section};
+use crate::check::{Check, Context, Resource, Section};
 use crate::procfs::kmsg::{self, Record};
 use crate::procfs::system;
 use crate::source::{Source, describe_error};
@@ -149,7 +149,7 @@ impl Check for KernelLog {
     }
 
     fn evaluate(&self, _ctx: &Context) -> Section {
-        let s = Section::new("kernel-log", "Kernel log", "dmesg | tail");
+        let s = Section::new("kernel-log", "Kernel log", "dmesg | tail", Resource::Kernel);
         let Some(records) = &self.records else {
             return s.skipped(self.error.as_deref().unwrap_or("no samples"));
         };

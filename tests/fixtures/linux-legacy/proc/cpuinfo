@@ -1,0 +1,12 @@
+processor	: 0
+vendor_id	: GenuineIntel
+model name	: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
+cpu MHz		: 2399.998
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep hypervisor lahf_lm
+
+processor	: 1
+vendor_id	: GenuineIntel
+model name	: Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
+cpu MHz		: 2399.998
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep hypervisor lahf_lm
+

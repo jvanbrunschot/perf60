@@ -8,8 +8,12 @@ plus an OK/WARN/CRIT report.
 ## Hard rules
 
 - **Never shell out.** No `std::process::Command`. Everything comes from `/proc`, `/sys`,
-  `/etc/os-release` and `/dev/kmsg` (or the `klogctl` syscall). The binary must work on a minimal
-  server with no procps/sysstat installed.
+  `/etc/os-release` and `/dev/kmsg`, or from read-only syscalls (`klogctl`, `statvfs`,
+  `adjtimex`). The binary must work on a minimal server with no procps/sysstat installed.
+- **All kernel access goes through `Source`** (`src/source.rs`): files, directories, kmsg,
+  `statvfs(path)` and `clock_status()`. That makes every check testable with `MemSource`
+  (in-memory, with `set_statvfs`/`set_clock`) and with fixture trees (`FsSource::new(root)`,
+  where syscalls come from `statvfs.txt` and `adjtimex.txt`).
 - **Parsers are pure.** `fn parse_x(input: &str) -> Result<T>` lives in `src/procfs/`, has no I/O,
   and is unit-tested against fixtures in `tests/fixtures/`. Only the readers touch the filesystem
   and are `#[cfg(target_os = "linux")]`, so `cargo test` runs on macOS as well.
@@ -19,6 +23,18 @@ plus an OK/WARN/CRIT report.
   decision in its OpenSpec change.
 - **Every threshold is spec'd.** Each WARN/CRIT threshold has a `#### Scenario` in the capability's
   spec and a unit test.
+- **Every section has a resource.** `Section::new(id, title, equivalent, Resource::…)`. The
+  resource (cpu, memory, disk, network, capacity, hardware, kernel, pressure) drives the
+  diagnosis.
+- **Fixture trees:**
+  - `tests/fixtures/linux-arm64` is captured with `scripts/capture-fixture.sh linux-arm64`.
+  - `tests/fixtures/linux-legacy` is synthetic, with old-kernel formats (see its README).
+  - `tests/fixture_tree.rs` runs every check against both and lists each tree's expected
+    SKIPPED sections. A new check must render on both trees or be added to the expected-skip
+    list with a reason.
+  - Recapturing `linux-arm64` changes values, so rebaseline the parser tests that assert exact
+    fixture values in the same change.
+  - `cargo run --example fixture_report -- linux-legacy` prints the report for a tree.
 
 ## Work method
 
@@ -91,8 +107,17 @@ Project context and rules for artifacts are in `openspec/config.yaml`.
 - Independent features (typically one check each) are built in parallel in git worktrees on branch
   `feat/<change-id>`, e.g. `git worktree add ../perf60-wt/<change-id> -b feat/<change-id>`, or an
   Agent with `isolation: "worktree"`.
-- To integrate: rebase the branch onto `main`, squash it to one commit, push it and open a PR
-  (see above). Remove the worktree after the merge (`git worktree remove`).
+- Larger efforts (phases) collect their features on an integration branch, e.g.
+  `phase/a-counters`, which becomes one PR, rebase-merged so each feature stays one commit.
+- To integrate a finished worktree branch, run `scripts/integrate-worktree.sh <worktree-path>`
+  from the main checkout, with the integration branch checked out. It:
+  - requires exactly one commit on the branch
+  - rebases it
+  - resolves registry conflicts with `scripts/resolve-registry.py`
+  - runs every gate
+  - fast-forwards the integration branch and removes the worktree and branch
+
+  A new section id must also be added to `ORDER` in `scripts/resolve-registry.py`.
 - Keep shared touchpoints minimal. A new check should only need its own files plus one line in
   `src/checks/mod.rs` (the registry) and, if needed, a `pub mod` line in `src/procfs/mod.rs`.
 
@@ -106,9 +131,12 @@ src/checks/          one module per check + registry (mod.rs)
 src/procfs/          pure parsers
 src/sysinfo.rs       system spec header
 src/report/          text and JSON renderers
-tests/fixtures/      captured /proc and /sys samples
+tests/fixtures/      fixture trees: linux-arm64 (captured), linux-legacy (synthetic)
+examples/fixture_report.rs  render the report for a fixture tree
 scripts/verify.sh    builds a static Linux binary and runs it in minimal containers
 scripts/capture-fixture.sh  captures a /proc+/sys fixture tree from a container
+scripts/resolve-registry.py resolves registry conflicts between parallel feature branches
+scripts/integrate-worktree.sh  rebase + gate + fast-forward one worktree branch
 scripts/build-release.sh    static release binaries + checksums into dist/
 .github/workflows/   ci.yml (PRs), release.yml (v* tags)
 ```

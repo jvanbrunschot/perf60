@@ -1,6 +1,6 @@
 //! `uptime`: load averages against CPU capacity.
 
-use crate::check::{Check, Context, SampleError, Section};
+use crate::check::{Check, Context, Resource, SampleError, Section};
 use crate::procfs::loadavg::{self, LoadAvg};
 use crate::source::Source;
 use crate::units;
@@ -28,7 +28,7 @@ impl Check for Load {
     }
 
     fn evaluate(&self, ctx: &Context) -> Section {
-        let s = Section::new("load", "Load averages", "uptime");
+        let s = Section::new("load", "Load averages", "uptime", Resource::Cpu);
         let Some(l) = &self.last else {
             return s.skipped(self.error.get().unwrap_or("no samples"));
         };

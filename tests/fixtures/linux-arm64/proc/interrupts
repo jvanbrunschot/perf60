@@ -1,0 +1,22 @@
+           CPU0       CPU1       CPU2       CPU3       
+ 11:    1650098    1664373    1654408    1664222    GICv3  27 Level     arch_timer
+ 14:        331          0          0          0    GICv3  36 Edge      virtio1
+ 15:          0          0          0          0 a003000.pl061   3 Edge      GPIO Key Poweroff
+ 16:       6154          0          0          0    GICv3  37 Edge      virtio2
+ 17:          5          0          0          0    GICv3  38 Edge      virtio3
+ 18:      94471          0          0          0    GICv3  42 Edge      virtio7
+ 19:          1          0          0          0    GICv3  39 Edge      virtio4
+ 20:     560187          0          0          0    GICv3  44 Edge      virtio9
+ 21:          1          0          0          0    GICv3  40 Edge      virtio5
+ 22:          1          0          0          0    GICv3  41 Edge      virtio6
+ 23:        920          0          0          0    GICv3  43 Edge      virtio8
+ 24:        451          0          0          0    GICv3  35 Edge      virtio0
+IPI0:     24698      18763      18398      18280       Rescheduling interrupts
+IPI1:    837245     756767     705915     698362       Function call interrupts
+IPI2:         0          0          0          0       CPU stop interrupts
+IPI3:         0          0          0          0       CPU stop NMIs
+IPI4:         0          0          0          0       Timer broadcast interrupts
+IPI5:       322        258        253        266       IRQ work interrupts
+IPI6:         0          0          0          0       CPU backtrace interrupts
+IPI7:         0          0          0          0       KGDB roundup interrupts
+Err:          0

@@ -41,7 +41,14 @@ pub fn render(r: &Report, color: bool, verbose: bool) -> String {
     head.extend(sys.hostname.clone());
     head.extend(sys.kernel.as_ref().map(|k| format!("Linux {k}")));
     head.extend(sys.distro.clone());
-    head.push(sys.arch.clone());
+    if sys.binary_arch.is_empty() || sys.binary_arch == sys.arch {
+        head.push(sys.arch.clone());
+    } else {
+        head.push(format!(
+            "{} (binary {}, emulated)",
+            sys.arch, sys.binary_arch
+        ));
+    }
     head.push(format!(
         "{} cpus",
         units::cpus(sys.cpus_online.max(1) as f64)
@@ -178,12 +185,12 @@ fn trim_float(v: f64) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::check::Section;
+    use crate::check::{Resource, Section};
     use crate::report::Sampling;
     use crate::sysinfo::SysInfo;
 
     fn report() -> Report {
-        let mut warn = Section::new("disk", "Disk I/O", "iostat -xz 1");
+        let mut warn = Section::new("disk", "Disk I/O", "iostat -xz 1", Resource::Disk);
         warn.summary("vda util 93%");
         warn.detail("vda r/s 10 w/s 900");
         warn.warn("vda saturated");
@@ -193,6 +200,7 @@ mod tests {
             kernel: Some("6.8.0".into()),
             distro: Some("Ubuntu 24.04".into()),
             arch: "x86_64".into(),
+            binary_arch: "x86_64".into(),
             cpus_online: 8,
             mem_total_bytes: Some(16 << 30),
             cgroup_cpu_limit: Some(1.5),
@@ -204,7 +212,7 @@ mod tests {
                 interval: 0.5,
                 count: 4,
             },
-            vec![Section::new("load", "Load", "uptime"), warn],
+            vec![Section::new("load", "Load", "uptime", Resource::Cpu), warn],
         )
     }
 
@@ -226,7 +234,7 @@ mod tests {
     }
 
     fn section(id: &'static str, warn: bool) -> Section {
-        let mut s = Section::new(id, "T", "t");
+        let mut s = Section::new(id, "T", "t", Resource::Kernel);
         s.summary("sum");
         s.detail("detail line");
         s.note("a note");
@@ -282,6 +290,15 @@ mod tests {
         assert_eq!(cols.len(), 2);
         assert_eq!(cols[0], cols[1]);
         assert!(t.contains("cpu-balance sum"));
+    }
+
+    #[test]
+    fn emulated_binary_is_flagged() {
+        let mut r = report();
+        r.system.arch = "aarch64".into();
+        r.system.binary_arch = "x86_64".into();
+        let t = render(&r, false, false);
+        assert!(t.contains("· aarch64 (binary x86_64, emulated) ·"), "{t}");
     }
 
     #[test]

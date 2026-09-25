@@ -1,0 +1,2 @@
+TcpExt: SyncookiesSent SyncookiesRecv ListenOverflows ListenDrops TCPTimeouts TCPBacklogDrop TCPAbortOnMemory
+TcpExt: 0 0 0 0 1234 0 0

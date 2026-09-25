@@ -52,9 +52,9 @@ mod tests {
         let v = parse(include_str!("../../tests/fixtures/linux-arm64/proc/vmstat")).unwrap();
         assert_eq!(v.get("pswpin"), Some(0));
         assert_eq!(v.get("pswpout"), Some(0));
-        assert_eq!(v.get("oom_kill"), Some(0));
-        assert_eq!(v.get("pgmajfault"), Some(639));
-        assert_eq!(v.pgscan_direct(), Some(0));
+        assert_eq!(v.get("oom_kill"), Some(2));
+        assert_eq!(v.get("pgmajfault"), Some(1113));
+        assert_eq!(v.pgscan_direct(), Some(6814));
         assert_eq!(v.get("nope"), None);
     }
 
