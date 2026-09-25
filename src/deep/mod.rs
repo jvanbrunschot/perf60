@@ -15,12 +15,16 @@ pub mod execsnoop;
 pub mod hist;
 #[cfg(feature = "deep")]
 pub mod probe;
+pub mod runqlat;
 
 /// The `--deep` checks of this build.
 pub fn checks() -> Vec<Box<dyn Check>> {
     #[cfg(feature = "deep")]
     {
-        vec![Box::new(execsnoop::Execsnoop::default())]
+        vec![
+            Box::new(execsnoop::Execsnoop::default()),
+            Box::new(runqlat::Runqlat::default()),
+        ]
     }
     #[cfg(not(feature = "deep"))]
     {

@@ -124,6 +124,7 @@ The kernel aggregates events during the sampling window and perf60 reads the tot
 | Section | BCC tool | What it shows |
 |---|---|---|
 | `execsnoop` | `execsnoop` | new processes by command, including the short-lived ones `pidstat` never sees; > 100 execs/s warns |
+| `runqlat` | `runqlat` | run queue latency distribution: how long runnable tasks wait for a CPU (p50/p99/max); p99 > 10 ms warns, > 50 ms is critical |
 
 `--deep` needs root, or `CAP_BPF` + `CAP_PERFMON` (kernel 5.8+); in a container, use
 `--privileged`. It uses raw tracepoints, so it works without tracefs. Probes that read kernel
