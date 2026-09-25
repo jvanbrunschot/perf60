@@ -2,6 +2,7 @@
 //! as `&str` so it can be tested against fixtures on any OS.
 
 pub mod diskstats;
+pub mod kmsg;
 pub mod loadavg;
 pub mod meminfo;
 pub mod net_dev;

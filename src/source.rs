@@ -72,10 +72,42 @@ impl Source for FsSource {
     }
 }
 
+/// Read `/dev/kmsg`; when that fails (device missing, no permission) fall back to the
+/// `syslog(2)` syscall. If both fail, the `/dev/kmsg` error is returned.
+#[cfg(target_os = "linux")]
+fn read_live_kmsg() -> io::Result<Vec<String>> {
+    read_dev_kmsg().or_else(|e| read_klogctl().map_err(|_| e))
+}
+
+/// `klogctl(SYSLOG_ACTION_READ_ALL)`, converted to the `/dev/kmsg` record format.
+#[cfg(target_os = "linux")]
+fn read_klogctl() -> io::Result<Vec<String>> {
+    const SYSLOG_ACTION_READ_ALL: libc::c_int = 3;
+    const SYSLOG_ACTION_SIZE_BUFFER: libc::c_int = 10;
+
+    // SAFETY: SIZE_BUFFER ignores the buffer arguments.
+    let size = unsafe { libc::klogctl(SYSLOG_ACTION_SIZE_BUFFER, std::ptr::null_mut(), 0) };
+    if size < 0 {
+        return Err(io::Error::last_os_error());
+    }
+    // The text output adds a `<prio>[ timestamp] ` prefix per line, so leave some headroom.
+    let len = (size as usize).clamp(1 << 14, 1 << 26) * 2;
+    let mut buf = vec![0u8; len];
+    // SAFETY: `buf` is valid for writes of `len` bytes, and `len` fits in c_int.
+    let n = unsafe { libc::klogctl(SYSLOG_ACTION_READ_ALL, buf.as_mut_ptr().cast(), len as _) };
+    if n < 0 {
+        return Err(io::Error::last_os_error());
+    }
+    buf.truncate(n as usize);
+    Ok(crate::procfs::kmsg::from_syslog(&String::from_utf8_lossy(
+        &buf,
+    )))
+}
+
 /// `/dev/kmsg` returns one record per `read()` and blocks at the end unless opened
 /// non-blocking, in which case it returns `EAGAIN`.
 #[cfg(target_os = "linux")]
-fn read_live_kmsg() -> io::Result<Vec<String>> {
+fn read_dev_kmsg() -> io::Result<Vec<String>> {
     use std::io::Read;
     use std::os::unix::fs::OpenOptionsExt;
 
