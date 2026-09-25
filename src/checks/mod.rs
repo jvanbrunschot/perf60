@@ -7,6 +7,7 @@ pub mod cpu;
 pub mod disk;
 pub mod load;
 pub mod memory;
+pub mod net;
 pub mod pressure;
 pub mod processes;
 
@@ -19,6 +20,8 @@ pub fn all() -> Vec<Box<dyn Check>> {
         Box::new(disk::Disk::default()),           // iostat -xz 1
         Box::new(memory::Memory::default()),       // free -m
         Box::new(memory::Swap::default()),         // vmstat si/so
+        Box::new(net::NetDev::default()),          // sar -n DEV 1
+        Box::new(net::Tcp::default()),             // sar -n TCP,ETCP 1
         Box::new(pressure::Pressure::default()),   // top / PSI
     ]
 }
