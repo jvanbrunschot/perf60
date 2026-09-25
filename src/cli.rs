@@ -12,6 +12,8 @@ Options:
   -j, --json                Print a JSON report
       --no-color            Disable ANSI colors (also honors NO_COLOR)
   -v, --verbose             Show detail lines for every section, not only problems
+      --deep                Add eBPF probes: execsnoop, runqlat, biolatency, tcpretrans
+                            (needs root, or CAP_BPF + CAP_PERFMON)
   -h, --help                Print help
   -V, --version             Print version
 
@@ -24,6 +26,7 @@ pub struct Options {
     pub json: bool,
     pub color: bool,
     pub verbose: bool,
+    pub deep: bool,
 }
 
 impl Default for Options {
@@ -34,6 +37,7 @@ impl Default for Options {
             json: false,
             color: true,
             verbose: false,
+            deep: false,
         }
     }
 }
@@ -65,6 +69,7 @@ pub fn parse<I: IntoIterator<Item = String>>(args: I) -> Result<Command, String>
             "-j" | "--json" => opts.json = true,
             "--no-color" => opts.color = false,
             "-v" | "--verbose" => opts.verbose = true,
+            "--deep" => opts.deep = true,
             "-i" | "--interval" => {
                 let v = value("--interval")?;
                 opts.interval = v
@@ -129,6 +134,18 @@ mod tests {
         assert!(p(&["--interval", "nan"]).is_err());
         assert!(p(&["--count"]).is_err());
         assert!(p(&["--bogus"]).unwrap_err().contains("--bogus"));
+    }
+
+    #[test]
+    fn verbose_and_deep() {
+        let Ok(Command::Run(o)) = p(&[]) else {
+            panic!()
+        };
+        assert!(!o.verbose && !o.deep);
+        let Ok(Command::Run(o)) = p(&["-v", "--deep"]) else {
+            panic!()
+        };
+        assert!(o.verbose && o.deep);
     }
 
     #[test]

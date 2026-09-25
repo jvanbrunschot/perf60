@@ -116,6 +116,21 @@ Memory checks also take the cgroup memory limit into account, so the report mean
 thing inside a container. The full behaviour of each check, including every threshold, is
 specified in [`openspec/specs/`](openspec/specs/).
 
+## Deep mode (eBPF)
+
+`perf60 --deep` adds probes from the BCC checklist in Gregg's *BPF Performance Tools* (2019).
+The kernel aggregates events during the sampling window and perf60 reads the totals at the end:
+
+| Section | BCC tool | What it shows |
+|---|---|---|
+| `execsnoop` | `execsnoop` | new processes by command, including the short-lived ones `pidstat` never sees; > 100 execs/s warns |
+
+`--deep` needs root, or `CAP_BPF` + `CAP_PERFMON` (kernel 5.8+); in a container, use
+`--privileged`. It uses raw tracepoints, so it works without tracefs. Probes that read kernel
+structs need the kernel's BTF (`/sys/kernel/btf/vmlinux`, standard on current distributions).
+Without the privileges, or on a build without eBPF support, the probe sections are SKIPPED
+with the reason and the rest of the report is unaffected.
+
 ## Building
 
 You need a Rust toolchain. No cross compiler or container is needed: the musl targets link with
@@ -123,6 +138,7 @@ Rust's bundled `rust-lld` (see `.cargo/config.toml`).
 
 ```sh
 cargo test                     # unit + fixture tests, runs on macOS too
+scripts/build-deep.sh          # --features deep (eBPF probes), built in a rust container
 scripts/build-release.sh       # dist/perf60-<version>-{x86_64,aarch64}-linux-musl + SHA256SUMS
 scripts/verify.sh              # run in alpine, debian-slim and busybox containers
 scripts/verify.sh x86_64-unknown-linux-musl   # the other architecture, under emulation
@@ -140,6 +156,11 @@ The [release workflow](.github/workflows/release.yml) reruns all CI checks, buil
 binaries, attests their build provenance, and publishes them with `SHA256SUMS` as a GitHub
 release. The tag must equal
 `v<Cargo.toml version>`. A tag with a suffix such as `v0.2.0-rc.1` becomes a pre-release.
+
+## License
+
+MIT. The eBPF programs in `perf60-ebpf/` are dual-licensed MIT OR GPL-2.0, because the kernel
+only lets GPL-compatible programs use the tracing helpers they need.
 
 ## Development
 

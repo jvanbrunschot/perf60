@@ -19,8 +19,25 @@ plus an OK/WARN/CRIT report.
   and are `#[cfg(target_os = "linux")]`, so `cargo test` runs on macOS as well.
 - **Degrade, don't die.** A missing file or a permission error marks the check `SKIPPED (reason)`.
   It never aborts the run.
-- **Few dependencies.** Allowed: `libc`, `serde`, `serde_json`. Anything else needs a design.md
-  decision in its OpenSpec change.
+- **Few dependencies.** Allowed: `libc`, `serde`, `serde_json`, and only behind the `deep`
+  feature `aya`, `aya-build` (build) and `aya-ebpf` (in `perf60-ebpf`). Anything else needs a
+  design.md decision in its OpenSpec change.
+- **`--deep` eBPF probes** (`src/deep/`, `perf60-ebpf/`):
+  - One probe is one eBPF program file, `perf60-ebpf/src/bin/<probe>.rs`, which Cargo
+    auto-discovers and `build.rs` embeds as `$OUT_DIR/<probe>`. Its user-space check lives in
+    `src/deep/<probe>.rs`, and it is registered in `deep::checks()`.
+  - Attach to **raw tracepoints**, never classic tracepoints: they need no tracefs, which
+    containers and minimal hosts lack. Read kernel structs with `bpf_probe_read_kernel` at
+    offsets from `deep::btf::kernel_offsets`, which uses the running kernel's BTF. Pass the
+    offsets as globals with `Probe::attach_with`.
+  - Maps only (hash, array, per-CPU array, log2 histograms via `perf60_common::log2_bucket`,
+    and in user space `deep::hist::Hist` for percentiles and BCC-style distribution lines).
+    No ring buffers or perf buffers: the kernel aggregates and user space reads once at the end.
+  - The evaluation (map contents → `Section`) is a pure, always-compiled function with unit
+    tests. Only loading and attaching is `#[cfg(feature = "deep")]`.
+  - A probe failure is SKIPPED with an actionable reason (`deep::caps` checks privileges first).
+  - `perf60-ebpf` is Dual MIT/GPL-2.0, because the kernel only exposes the helpers it uses
+    to GPL programs. Everything else is MIT.
 - **Every threshold is spec'd.** Each WARN/CRIT threshold has a `#### Scenario` in the capability's
   spec and a unit test.
 - **Every section has a resource.** `Section::new(id, title, equivalent, Resource::…)`. The
@@ -143,16 +160,30 @@ scripts/verify.sh    builds a static Linux binary and runs it in minimal contain
 scripts/capture-fixture.sh  captures a /proc+/sys fixture tree from a container
 scripts/resolve-registry.py resolves registry conflicts between parallel feature branches
 scripts/integrate-worktree.sh  rebase + gate + fast-forward one worktree branch
-scripts/build-release.sh    static release binaries + checksums into dist/
+scripts/build-release.sh    static release binaries + checksums into dist/ (PERF60_FEATURES=deep in CI)
+scripts/build-deep.sh       --features deep build inside a rust container
+scripts/install-bpf-linker.sh  pinned, checksum-verified bpf-linker
+src/deep/            --deep probes: loader, BTF reader, capability check, one module per probe
+perf60-common/       no_std map types shared with the eBPF programs
+perf60-ebpf/         eBPF programs, one per src/bin/<probe>.rs (Dual MIT/GPL-2.0)
 .github/workflows/   ci.yml (PRs), release.yml (v* tags)
 ```
 
 ## Building and verifying
 
-- Unit tests (macOS or Linux): `cargo test`
+- Unit tests (macOS or Linux): `cargo test` (without `deep`; the eBPF crate is not a default
+  member of the workspace)
+- With the eBPF probes: `scripts/build-deep.sh [triple…]` builds `--features deep` inside a rust
+  container, so macOS needs no nightly, bpf-linker or LLVM. On Linux with the toolchain (as in
+  CI): `cargo build --release --features deep --target <triple>`.
+  - The nightly is pinned in `build.rs` (`EBPF_TOOLCHAIN`), and CI reads it from there.
+  - bpf-linker is pinned by version and per-arch SHA-256 in `scripts/install-bpf-linker.sh`.
+  - Dependabot updates neither pin, so bump both by hand in a reviewed PR.
 - Static Linux binary: `cargo build --release --target aarch64-unknown-linux-musl`
   (or `x86_64-unknown-linux-musl`). This links with Rust's bundled `rust-lld` via
   `.cargo/config.toml`, so no cross toolchain is needed, even on macOS.
 - Release binaries for both architectures plus `SHA256SUMS`: `scripts/build-release.sh` (output in `dist/`)
-- End-to-end in minimal containers (alpine, debian-slim, busybox): `scripts/verify.sh [target]`.
+- End-to-end in minimal containers (alpine, debian-slim, busybox):
+  `scripts/verify.sh [--deep] [target]`. `--deep` adds a privileged run whose probes must not be
+  SKIPPED.
   `x86_64-unknown-linux-musl` runs under amd64 emulation on arm64 hosts.

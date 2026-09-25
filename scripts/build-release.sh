@@ -1,6 +1,8 @@
 #!/bin/sh
 # Build static release binaries for x86_64 and aarch64 into dist/, with SHA256SUMS.
 # Links with Rust's bundled rust-lld (.cargo/config.toml), so it works from macOS or Linux.
+# PERF60_FEATURES=deep adds the eBPF probes (needs the pinned nightly + bpf-linker, as in CI;
+# on macOS use scripts/build-deep.sh instead).
 set -eu
 cd "$(dirname "$0")/.."
 
@@ -11,7 +13,7 @@ mkdir -p dist
 for arch in x86_64 aarch64; do
   target="$arch-unknown-linux-musl"
   rustup target list --installed | grep -qx "$target" || rustup target add "$target"
-  cargo build --locked --release --target "$target"
+  cargo build --locked --release ${PERF60_FEATURES:+--features "$PERF60_FEATURES"} --target "$target"
   out="dist/perf60-$version-$arch-linux-musl"
   cp "target/$target/release/perf60" "$out"
   if ! file "$out" | grep -Eq "static(-pie)? linked|statically linked"; then

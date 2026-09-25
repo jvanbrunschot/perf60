@@ -1,0 +1,16 @@
+[package]
+name = "perf60-ebpf"
+version = "0.1.0"
+edition = "2024"
+description = "eBPF programs for perf60 --deep"
+# The kernel only exposes the helpers these programs use to GPL-compatible programs.
+license = "MIT OR GPL-2.0"
+
+[dependencies]
+aya-ebpf = { version = "0.2.1", default-features = false }
+perf60-common = { path = "../perf60-common" }
+
+# One eBPF object per probe: every src/bin/<probe>.rs is auto-discovered and embedded by
+# perf60's build.rs as $OUT_DIR/<probe>.
+[lib]
+path = "src/lib.rs"
