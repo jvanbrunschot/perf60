@@ -5,6 +5,7 @@ use crate::check::Check;
 
 pub mod disk;
 pub mod load;
+pub mod pressure;
 pub mod processes;
 
 pub fn all() -> Vec<Box<dyn Check>> {
@@ -12,5 +13,6 @@ pub fn all() -> Vec<Box<dyn Check>> {
         Box::new(load::Load::default()),           // uptime
         Box::new(processes::Processes::default()), // pidstat 1
         Box::new(disk::Disk::default()),           // iostat -xz 1
+        Box::new(pressure::Pressure::default()),   // top / PSI
     ]
 }
